@@ -1,6 +1,6 @@
 # 常用运维命令入口，方便新项目 clone 后直接使用。
 
-.PHONY: init local-certs pull up down restart ps logs check reload renew clean redis-test-up redis-test-down test-first-layer test-waitroom benchmark-waitroom waitroom-summary benchmark-gateway test-comprehensive
+.PHONY: init local-certs pull up down up-local down-local restart ps logs check reload renew clean redis-test-up redis-test-down test-first-layer test-waitroom benchmark-waitroom waitroom-summary benchmark-gateway test-comprehensive
 
 init:
 	cp -n .env.example .env || true
@@ -11,7 +11,7 @@ local-certs:
 	./ssl/scripts/init-local-certs.sh
 
 pull:
-	docker compose pull openresty frontend api-service admin-service
+	docker compose pull openresty
 	docker compose --profile ops pull certbot
 
 up:
@@ -19,6 +19,12 @@ up:
 
 down:
 	docker compose down
+
+up-local:
+	docker compose -f docker-compose.yml -f examples/backend/docker-compose.local.yml up -d
+
+down-local:
+	docker compose -f docker-compose.yml -f examples/backend/docker-compose.local.yml down --remove-orphans
 
 restart:
 	docker compose down

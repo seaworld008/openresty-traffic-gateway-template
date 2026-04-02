@@ -20,6 +20,11 @@
 3. 在不明显增加系统复杂度的前提下，尽量提高稳定性和可维护性
 4. 通过策略配置而不是改代码的方式，支持不同系统、不同容量模型和不同流量治理策略
 
+额外的结构约束：
+
+- 主 `docker-compose.yml` 只保留核心服务
+- 本地联调示例后端统一放在 `examples/backend/`
+
 ## 3. 架构分层
 
 当前架构可以理解成三层：
@@ -40,6 +45,7 @@
 关键文件：
 
 - [docker-compose.yml](/data/openresty-install/docker-compose.yml)
+- [examples/backend/docker-compose.local.yml](/data/openresty-install/examples/backend/docker-compose.local.yml)
 - [openresty/nginx.conf](/data/openresty-install/openresty/nginx.conf)
 - [openresty/conf.d/00-global.conf](/data/openresty-install/openresty/conf.d/00-global.conf)
 - [openresty/conf.d/01-upstreams.conf](/data/openresty-install/openresty/conf.d/01-upstreams.conf)

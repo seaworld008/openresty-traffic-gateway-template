@@ -7,6 +7,8 @@ REPO_ROOT=$(cd "${SCRIPT_DIR}/../.." && pwd)
 
 cd "${REPO_ROOT}"
 
+COMPOSE_LOCAL=(docker compose -f docker-compose.yml -f examples/backend/docker-compose.local.yml)
+
 require_cmd() {
   if ! command -v "$1" >/dev/null 2>&1; then
     echo "缺少命令: $1" >&2
@@ -27,7 +29,9 @@ trap cleanup EXIT
 cp -f .env.example .env
 chmod +x ssl/scripts/*.sh
 ./ssl/scripts/init-local-certs.sh >/dev/null
+("${COMPOSE_LOCAL[@]}" down --remove-orphans) >/dev/null 2>&1 || true
 docker compose up -d >/dev/null
+("${COMPOSE_LOCAL[@]}" up -d) >/dev/null
 
 docker rm -f openresty-local-redis >/dev/null 2>&1 || true
 docker run -d --name openresty-local-redis --network openresty-install_gateway --network-alias redis redis:7.2.5-alpine >/dev/null

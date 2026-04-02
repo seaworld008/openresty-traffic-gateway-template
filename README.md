@@ -269,13 +269,13 @@ make init
 再启动整套服务：
 
 ```bash
-docker compose up -d
+docker compose -f docker-compose.yml -f examples/backend/docker-compose.local.yml up -d
 ```
 
 或者：
 
 ```bash
-make up
+make up-local
 ```
 
 执行配置校验：
@@ -318,7 +318,7 @@ docker compose up -d openresty
 
 - `openresty` 是唯一对外暴露的服务，绑定 `80:80` 和 `443:443`
 - `certbot` 是工具型服务，通过脚本执行 `docker compose run --rm` 来调用
-- 自带示例后端，所以 clone 后即可直接本机联调
+- 主 `docker-compose.yml` 只保留核心服务；示例后端已拆到 `examples/backend/docker-compose.local.yml`
 - 所有挂载目录都基于仓库相对路径
 - 日志、缓存和证书都可以跨容器重建持久保留
 
@@ -579,6 +579,12 @@ docker compose down
 
 ```bash
 make down
+```
+
+如果当前是本地联调模式，推荐直接执行：
+
+```bash
+make down-local
 ```
 
 ## 运维最佳实践

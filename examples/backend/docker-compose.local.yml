@@ -1,0 +1,34 @@
+services:
+  # 本地验证专用示例后端，不属于生产主栈。
+  frontend:
+    image: traefik/whoami:v1.11.0
+    container_name: gateway-frontend
+    restart: unless-stopped
+    networks:
+      - gateway
+
+  api-service:
+    image: traefik/whoami:v1.11.0
+    container_name: gateway-api
+    restart: unless-stopped
+    networks:
+      - gateway
+
+  admin-service:
+    image: traefik/whoami:v1.11.0
+    container_name: gateway-admin
+    restart: unless-stopped
+    networks:
+      - gateway
+
+  echo-service:
+    image: ${ECHO_BACKEND_IMAGE:-mccutchen/go-httpbin:2.21.0}
+    container_name: gateway-echo
+    restart: unless-stopped
+    networks:
+      - gateway
+
+networks:
+  gateway:
+    external: true
+    name: openresty-install_gateway

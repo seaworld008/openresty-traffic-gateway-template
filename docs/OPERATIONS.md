@@ -48,10 +48,22 @@ make local-certs
 make up
 ```
 
+如果需要本地联调示例后端：
+
+```bash
+make up-local
+```
+
 ### 停止服务
 
 ```bash
 make down
+```
+
+如果当前是本地联调模式：
+
+```bash
+make down-local
 ```
 
 ### 重启服务

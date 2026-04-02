@@ -7,6 +7,12 @@ REPO_ROOT=$(cd "${SCRIPT_DIR}/../.." && pwd)
 
 cd "${REPO_ROOT}"
 
+COMPOSE_LOCAL=(docker compose -f docker-compose.yml -f examples/backend/docker-compose.local.yml)
+
+("${COMPOSE_LOCAL[@]}" down --remove-orphans) >/dev/null 2>&1 || true
+docker compose up -d >/dev/null
+("${COMPOSE_LOCAL[@]}" up -d) >/dev/null
+
 echo "[1/6] 第一层功能测试"
 bash examples/scripts/test-first-layer.sh
 

@@ -40,6 +40,8 @@
 
 负责后端服务拓扑定义。
 
+当前 upstream 已按运行期 DNS 解析方式配置，因此主栈不再强依赖本地示例后端必须存在。
+
 ### 2.4 可选真实 IP
 
 - [openresty/conf.d/10-real-ip.conf.example](/data/openresty-install/openresty/conf.d/10-real-ip.conf.example)
@@ -56,6 +58,12 @@
 
 - 第一层公共能力：[openresty/lua/gateway](/data/openresty-install/openresty/lua/gateway)
 - 第二阶段等待室：[openresty/lua/admission](/data/openresty-install/openresty/lua/admission)
+
+### 2.7 本地测试后端
+
+- [examples/backend/docker-compose.local.yml](/data/openresty-install/examples/backend/docker-compose.local.yml)
+
+这个文件只用于本地联调与功能验证，不属于生产主栈。
 
 ## 3. 如何修改容量参数
 
