@@ -14,6 +14,7 @@ services:
       echo-service:
         condition: service_started
     environment:
+      TZ: ${TZ:-Asia/Shanghai}
       GATEWAY_REDIS_HOST: ${GATEWAY_REDIS_HOST:-redis}
       GATEWAY_REDIS_PORT: ${GATEWAY_REDIS_PORT:-6379}
       GATEWAY_REDIS_DB: ${GATEWAY_REDIS_DB:-0}
@@ -53,6 +54,8 @@ services:
     image: ${CERTBOT_IMAGE:-certbot/certbot:v5.4.0}
     profiles: ["ops"]
     working_dir: /workdir
+    environment:
+      TZ: ${TZ:-Asia/Shanghai}
     entrypoint: ["/bin/sh", "-c"]
     command: ["trap exit TERM; while :; do sleep 3600; done"]
     volumes:

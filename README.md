@@ -2,6 +2,10 @@
 
 这个仓库是一套面向中小团队的 OpenResty 自建部署模板，目标不是“能跑起来就行”，而是尽量贴近生产可维护实践：单台 Linux 主机、Docker Compose 部署、所有持久化状态都放在当前仓库目录、目录结构清晰，后续其他项目可以直接 clone 后快速启动。
 
+推荐 GitHub 中文描述：
+
+- 面向生产的 OpenResty 流量网关模板，支持热点活动流量保护、等待室准入、关键链路保护与可复用策略控制。
+
 ## 这套模板解决什么问题
 
 它不仅解决 OpenResty 如何启动，也解决后续怎么维护：
@@ -183,6 +187,60 @@ Certbot 镜像也在 `.env.example` 里固定了 tag，理由完全相同。
 - 原始目标 tag `openresty/openresty:1.29.2.3-0-bookworm-fat` 在本机实际拉取时返回 `manifest unknown`
 - 因此这里按“官方镜像 + 稳定版本 + 完整 tag”原则，改为已经验证存在的 `openresty/openresty:1.29.2.2-1-bookworm-fat`
 - Certbot 镜像实际可拉取的完整 tag 为 `certbot/certbot:v5.4.0`，需要保留 `v` 前缀
+
+## GitHub 展示建议
+
+### 推荐仓库名
+
+- `openresty-traffic-gateway-template`
+
+### 推荐 GitHub 中文描述
+
+- 面向生产的 OpenResty 流量网关模板，支持热点活动流量保护、等待室准入、关键链路保护与可复用策略控制。
+
+### 推荐 GitHub 英文描述
+
+- Production-ready OpenResty gateway template with traffic protection, waitroom admission control, and reusable policy-based routing.
+
+### 推荐 Topics
+
+- `openresty`
+- `nginx`
+- `gateway`
+- `reverse-proxy`
+- `traffic-control`
+- `rate-limit`
+- `waitroom`
+- `admission-control`
+- `high-concurrency`
+- `hotspot-protection`
+- `flash-sale`
+- `ticketing`
+- `enrollment`
+- `policy-based-routing`
+- `traffic-gateway`
+
+### 推荐搜索关键词
+
+为了让 GitHub 搜索、站内检索和搜索引擎更容易命中，建议在 README 首屏或项目简介中长期保留这些中英文关键词：
+
+- OpenResty
+- Nginx Gateway
+- 流量网关
+- 反向代理
+- 热点活动保护
+- 等待室
+- 排队准入
+- Admission Control
+- Waitroom
+- 高并发
+- 抢课
+- 报名系统
+- 秒杀
+- 预约放号
+- Reverse Proxy
+- Traffic Protection
+- Protected Checkout Flow
 
 ## 快速开始
 

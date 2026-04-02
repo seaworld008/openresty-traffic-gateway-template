@@ -19,6 +19,17 @@
 
 ## 2. 日常命令
 
+### 默认时区
+
+当前仓库在 `.env.example` 中显式设置：
+
+```bash
+TZ=Asia/Shanghai
+```
+
+并通过 `docker-compose.yml` 传入 `openresty` 和 `certbot` 容器。  
+如果你们后续部署在其他时区环境，可按需修改，但建议整套系统统一时区，避免日志排障混乱。
+
 ### 初始化
 
 ```bash
