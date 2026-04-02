@@ -1,6 +1,6 @@
 # 常用运维命令入口，方便新项目 clone 后直接使用。
 
-.PHONY: init local-certs pull up down up-local down-local restart ps logs check reload renew clean redis-test-up redis-test-down test-first-layer test-waitroom benchmark-waitroom waitroom-summary benchmark-gateway test-comprehensive
+.PHONY: init local-certs pull up down up-local down-local restart ps logs check reload renew clean redis-test-up redis-test-down conf-examples-on conf-examples-off test-first-layer test-waitroom benchmark-waitroom waitroom-summary benchmark-gateway test-comprehensive
 
 init:
 	cp -n .env.example .env || true
@@ -53,6 +53,12 @@ redis-test-up:
 
 redis-test-down:
 	docker rm -f openresty-local-redis >/dev/null 2>&1 || true
+
+conf-examples-on:
+	bash examples/scripts/activate_conf_examples.sh
+
+conf-examples-off:
+	bash examples/scripts/deactivate_conf_examples.sh
 
 test-first-layer:
 	bash examples/scripts/test-first-layer.sh

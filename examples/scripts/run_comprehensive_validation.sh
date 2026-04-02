@@ -9,9 +9,16 @@ cd "${REPO_ROOT}"
 
 COMPOSE_LOCAL=(docker compose -f docker-compose.yml -f examples/backend/docker-compose.local.yml)
 
+rm -f openresty/conf.d/10-real-ip.conf
+bash examples/scripts/activate_conf_examples.sh >/dev/null
 ("${COMPOSE_LOCAL[@]}" down --remove-orphans) >/dev/null 2>&1 || true
+docker compose down >/dev/null 2>&1 || true
 docker compose up -d >/dev/null
-("${COMPOSE_LOCAL[@]}" up -d) >/dev/null
+sleep 2
+("${COMPOSE_LOCAL[@]}" up -d >/dev/null)
+sleep 2
+docker compose restart openresty >/dev/null
+sleep 2
 
 echo "[1/6] 第一层功能测试"
 bash examples/scripts/test-first-layer.sh
@@ -45,5 +52,6 @@ curl -k -sS \
   https://enroll.example.test/api/ops/waitroom/summary
 
 docker rm -f openresty-local-redis >/dev/null 2>&1 || true
+bash examples/scripts/deactivate_conf_examples.sh >/dev/null 2>&1 || true
 
 echo "综合验证完成。"

@@ -23,6 +23,7 @@ require_cmd xxd
 
 cleanup() {
   docker rm -f openresty-local-redis >/dev/null 2>&1 || true
+  bash examples/scripts/deactivate_conf_examples.sh >/dev/null 2>&1 || true
 }
 
 trap cleanup EXIT
@@ -30,10 +31,17 @@ trap cleanup EXIT
 cp -f .env.example .env
 chmod +x ssl/scripts/*.sh
 ./ssl/scripts/init-local-certs.sh >/dev/null
+rm -f openresty/conf.d/10-real-ip.conf
+bash examples/scripts/activate_conf_examples.sh >/dev/null
 
 ("${COMPOSE_LOCAL[@]}" down --remove-orphans) >/dev/null 2>&1 || true
+docker compose down >/dev/null 2>&1 || true
 docker compose up -d >/dev/null
-("${COMPOSE_LOCAL[@]}" up -d) >/dev/null
+sleep 2
+("${COMPOSE_LOCAL[@]}" up -d >/dev/null)
+sleep 2
+docker compose restart openresty >/dev/null
+sleep 2
 docker rm -f openresty-local-redis >/dev/null 2>&1 || true
 docker run -d --name openresty-local-redis --network openresty-install_gateway --network-alias redis redis:7.2.5-alpine >/dev/null
 
@@ -66,6 +74,11 @@ STATUS_COUNTS=$(seq 1 25 | xargs -I{} -P25 sh -c \
   --resolve risk-gateway.example.test:443:127.0.0.1 \
   https://risk-gateway.example.test/" | sort | uniq -c)
 echo "${STATUS_COUNTS}" | grep -q '429'
+sleep 2
+
+echo "[5/8] 风控默认路由可正常通过"
+curl -k -sS --resolve risk-gateway.example.test:443:127.0.0.1 \
+  https://risk-gateway.example.test/ | grep -q 'Hostname:'
 
 JWT_TOKEN=$(python3 - <<'PY'
 import base64, hashlib, hmac, json, time
@@ -81,7 +94,7 @@ print(f"{header}.{payload}.{signature}")
 PY
 )
 
-echo "[5/7] JWT + Redis + Body 改写"
+echo "[6/8] JWT + Redis + Body 改写"
 ORDERS_RESPONSE=$(curl -k -sS \
   --resolve partner-api.example.test:443:127.0.0.1 \
   -H "Authorization: Bearer ${JWT_TOKEN}" \
@@ -93,7 +106,7 @@ ORDERS_RESPONSE=$(curl -k -sS \
 echo "${ORDERS_RESPONSE}" | grep -q '"gateway_route":"partner_orders"'
 echo "${ORDERS_RESPONSE}" | grep -q '"partner_tenant":"acme"'
 
-echo "[6/7] HMAC / 时间戳签名"
+echo "[7/8] HMAC / 时间戳签名"
 TS=$(date +%s)
 SIG=$(printf 'POST\n/v1/hooks/inventory\n%s\n%s' "${TS}" '{"event":"inventory.low"}' \
   | openssl dgst -sha256 -hmac 'partner-hmac-secret' -binary \
@@ -108,7 +121,7 @@ HOOK_RESPONSE=$(curl -k -sS \
   https://partner-api.example.test/v1/hooks/inventory)
 echo "${HOOK_RESPONSE}" | grep -q '"gateway_route":"partner_hook_inventory"'
 
-echo "[7/7] 灰度路由与 Redis 开关"
+echo "[8/8] 灰度路由与 Redis 开关"
 curl -k -sS -D /tmp/gray_canary.headers -o /tmp/gray_canary.body \
   -H 'X-Gray-Release: canary' \
   --resolve gray-release.example.test:443:127.0.0.1 \

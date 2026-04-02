@@ -31,4 +31,4 @@ services:
 networks:
   gateway:
     external: true
-    name: openresty-install_gateway
+    name: ${DOCKER_NETWORK_NAME:-openresty-install_gateway}

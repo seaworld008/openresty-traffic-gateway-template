@@ -52,7 +52,7 @@
 
 - [openresty/conf.d](/data/openresty-install/openresty/conf.d)
 
-每个域名一个文件，直接平铺在 `conf.d/` 下。
+每个域名一个模板文件，直接平铺在 `conf.d/` 下，统一使用 `*.conf.example`。
 
 ### 2.6 Lua 逻辑
 
@@ -99,11 +99,11 @@ capacity = {
 
 复制：
 
-- [case-enroll-waitroom.conf](/data/openresty-install/openresty/conf.d/case-enroll-waitroom.conf)
+- [waitroom-enrollment-gateway.conf.example](/data/openresty-install/openresty/conf.d/waitroom-enrollment-gateway.conf.example)
 
 改成你的新系统文件，例如：
 
-- `case-enroll-campus-a.conf`
+- `campus-a-enrollment-gateway.conf`
 
 ### 第二步：修改域名和策略 ID
 
@@ -148,7 +148,7 @@ make test-waitroom
 
 如果新系统不需要等待室，只需要第一层公共能力：
 
-1. 复制 [case-partner-api.conf](/data/openresty-install/openresty/conf.d/case-partner-api.conf) 或其他合适案例
+1. 复制 [partner-api-gateway.conf.example](/data/openresty-install/openresty/conf.d/partner-api-gateway.conf.example) 或其他合适模板
 2. 绑定新的 `gateway_policy`
 3. 在 [openresty/lua/gateway/policies.lua](/data/openresty-install/openresty/lua/gateway/policies.lua) 中增加策略
 4. `make check`

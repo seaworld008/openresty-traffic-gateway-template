@@ -46,7 +46,7 @@
 这部分实现位于：
 
 - [openresty/lua/admission](/data/openresty-install/openresty/lua/admission)
-- [openresty/conf.d/case-enroll-waitroom.conf](/data/openresty-install/openresty/conf.d/case-enroll-waitroom.conf)
+- [openresty/conf.d/waitroom-enrollment-gateway.conf.example](/data/openresty-install/openresty/conf.d/waitroom-enrollment-gateway.conf.example)
 - [examples/waitroom-best-practice.md](/data/openresty-install/examples/waitroom-best-practice.md)
 
 这一层的目标不是“让所有人都能冲进后端”，而是：
@@ -151,14 +151,16 @@ Internet -> OpenResty
 │   ├── conf.d/
 │   │   ├── 00-global.conf
 │   │   ├── 01-upstreams.conf
-│   │   ├── example-www.conf
-│   │   ├── example-api.conf
-│   │   ├── example-admin.conf
-│   │   ├── example-static.conf
-│   │   ├── case-risk-gateway.conf
-│   │   ├── case-partner-api.conf
-│   │   ├── case-gray-release.conf
-│   │   └── case-enroll-waitroom.conf
+│   │   ├── 10-real-ip.conf.example
+│   │   ├── README.md
+│   │   ├── frontend-proxy.conf.example
+│   │   ├── api-proxy.conf.example
+│   │   ├── admin-console-proxy.conf.example
+│   │   ├── static-local-root.conf.example
+│   │   ├── risk-protected-proxy.conf.example
+│   │   ├── partner-api-gateway.conf.example
+│   │   ├── gray-release-proxy.conf.example
+│   │   └── waitroom-enrollment-gateway.conf.example
 │   ├── snippets/
 │   ├── logs/
 │   ├── cache/
@@ -390,13 +392,13 @@ docker compose up -d openresty
 
 ### 高级案例站点
 
-- [openresty/conf.d/case-risk-gateway.conf](/data/openresty-install/openresty/conf.d/case-risk-gateway.conf)
+- [openresty/conf.d/risk-protected-proxy.conf.example](/data/openresty-install/openresty/conf.d/risk-protected-proxy.conf.example)
   日常风控入口案例，覆盖限流、UA 风控、IP 黑白名单、失败重试和简单熔断。
-- [openresty/conf.d/case-partner-api.conf](/data/openresty-install/openresty/conf.d/case-partner-api.conf)
+- [openresty/conf.d/partner-api-gateway.conf.example](/data/openresty-install/openresty/conf.d/partner-api-gateway.conf.example)
   对接型 API 案例，覆盖 JWT、HMAC、Redis 合作方配置、统一请求 ID、Header / Body 改写和动态路由。
-- [openresty/conf.d/case-gray-release.conf](/data/openresty-install/openresty/conf.d/case-gray-release.conf)
+- [openresty/conf.d/gray-release-proxy.conf.example](/data/openresty-install/openresty/conf.d/gray-release-proxy.conf.example)
   灰度发布案例，覆盖 Header 灰度、按百分比灰度和 Redis 统一开关。
-- [openresty/conf.d/case-enroll-waitroom.conf](/data/openresty-install/openresty/conf.d/case-enroll-waitroom.conf)
+- [openresty/conf.d/waitroom-enrollment-gateway.conf.example](/data/openresty-install/openresty/conf.d/waitroom-enrollment-gateway.conf.example)
   第二阶段等待室案例，覆盖入口排队、准入通行证、关键步骤保护和通用可调阈值策略。
 
 ### 第二阶段策略怎么调

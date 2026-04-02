@@ -22,6 +22,7 @@ require_cmd jq
 
 cleanup() {
   docker rm -f openresty-local-redis >/dev/null 2>&1 || true
+  bash examples/scripts/deactivate_conf_examples.sh >/dev/null 2>&1 || true
 }
 
 trap cleanup EXIT
@@ -29,12 +30,20 @@ trap cleanup EXIT
 cp -f .env.example .env
 chmod +x ssl/scripts/*.sh
 ./ssl/scripts/init-local-certs.sh >/dev/null
+rm -f openresty/conf.d/10-real-ip.conf
+bash examples/scripts/activate_conf_examples.sh >/dev/null
 ("${COMPOSE_LOCAL[@]}" down --remove-orphans) >/dev/null 2>&1 || true
+docker compose down >/dev/null 2>&1 || true
 docker compose up -d >/dev/null
-("${COMPOSE_LOCAL[@]}" up -d) >/dev/null
+sleep 2
+("${COMPOSE_LOCAL[@]}" up -d >/dev/null)
+sleep 2
+docker compose restart openresty >/dev/null
+sleep 2
 
 docker rm -f openresty-local-redis >/dev/null 2>&1 || true
 docker run -d --name openresty-local-redis --network openresty-install_gateway --network-alias redis redis:7.2.5-alpine >/dev/null
+sleep 1
 docker compose exec -T openresty openresty -t >/dev/null
 
 echo "[1/6] 前四个用户在稳态容量+突发缓冲内获得准入"
