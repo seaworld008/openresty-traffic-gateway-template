@@ -68,9 +68,9 @@
 关键文件：
 
 - [openresty/lua/gateway](/data/openresty-install/openresty/lua/gateway)
-- [openresty/conf.d/sites/case-risk-gateway.conf](/data/openresty-install/openresty/conf.d/sites/case-risk-gateway.conf)
-- [openresty/conf.d/sites/case-partner-api.conf](/data/openresty-install/openresty/conf.d/sites/case-partner-api.conf)
-- [openresty/conf.d/sites/case-gray-release.conf](/data/openresty-install/openresty/conf.d/sites/case-gray-release.conf)
+- [openresty/conf.d/case-risk-gateway.conf](/data/openresty-install/openresty/conf.d/case-risk-gateway.conf)
+- [openresty/conf.d/case-partner-api.conf](/data/openresty-install/openresty/conf.d/case-partner-api.conf)
+- [openresty/conf.d/case-gray-release.conf](/data/openresty-install/openresty/conf.d/case-gray-release.conf)
 
 ### 3.3 第二阶段高并发等待室层
 
@@ -86,7 +86,7 @@
 关键文件：
 
 - [openresty/lua/admission](/data/openresty-install/openresty/lua/admission)
-- [openresty/conf.d/sites/case-enroll-waitroom.conf](/data/openresty-install/openresty/conf.d/sites/case-enroll-waitroom.conf)
+- [openresty/conf.d/case-enroll-waitroom.conf](/data/openresty-install/openresty/conf.d/case-enroll-waitroom.conf)
 - [openresty/html/waitroom/index.html](/data/openresty-install/openresty/html/waitroom/index.html)
 - [openresty/html/waitroom/ops.html](/data/openresty-install/openresty/html/waitroom/ops.html)
 

@@ -50,9 +50,9 @@
 
 ### 2.5 站点文件
 
-- [openresty/conf.d/sites](/data/openresty-install/openresty/conf.d/sites)
+- [openresty/conf.d](/data/openresty-install/openresty/conf.d)
 
-每个域名一个文件。
+每个域名一个文件，直接平铺在 `conf.d/` 下。
 
 ### 2.6 Lua 逻辑
 
@@ -99,7 +99,7 @@ capacity = {
 
 复制：
 
-- [case-enroll-waitroom.conf](/data/openresty-install/openresty/conf.d/sites/case-enroll-waitroom.conf)
+- [case-enroll-waitroom.conf](/data/openresty-install/openresty/conf.d/case-enroll-waitroom.conf)
 
 改成你的新系统文件，例如：
 
@@ -148,7 +148,7 @@ make test-waitroom
 
 如果新系统不需要等待室，只需要第一层公共能力：
 
-1. 复制 [case-partner-api.conf](/data/openresty-install/openresty/conf.d/sites/case-partner-api.conf) 或其他合适案例
+1. 复制 [case-partner-api.conf](/data/openresty-install/openresty/conf.d/case-partner-api.conf) 或其他合适案例
 2. 绑定新的 `gateway_policy`
 3. 在 [openresty/lua/gateway/policies.lua](/data/openresty-install/openresty/lua/gateway/policies.lua) 中增加策略
 4. `make check`

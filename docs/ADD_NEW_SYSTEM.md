@@ -11,7 +11,7 @@
 
 参考：
 
-- [openresty/conf.d/sites/case-partner-api.conf](/data/openresty-install/openresty/conf.d/sites/case-partner-api.conf)
+- [openresty/conf.d/case-partner-api.conf](/data/openresty-install/openresty/conf.d/case-partner-api.conf)
 - [openresty/lua/gateway/policies.lua](/data/openresty-install/openresty/lua/gateway/policies.lua)
 
 ### 类型 B：热点活动入口
@@ -25,7 +25,7 @@
 
 参考：
 
-- [openresty/conf.d/sites/case-enroll-waitroom.conf](/data/openresty-install/openresty/conf.d/sites/case-enroll-waitroom.conf)
+- [openresty/conf.d/case-enroll-waitroom.conf](/data/openresty-install/openresty/conf.d/case-enroll-waitroom.conf)
 - [openresty/lua/admission/policies.lua](/data/openresty-install/openresty/lua/admission/policies.lua)
 
 ## 2. 新增普通系统
@@ -44,7 +44,7 @@ make test-first-layer
 
 ## 3. 新增热点活动系统
 
-1. 复制 [case-enroll-waitroom.conf](/data/openresty-install/openresty/conf.d/sites/case-enroll-waitroom.conf)
+1. 复制 [case-enroll-waitroom.conf](/data/openresty-install/openresty/conf.d/case-enroll-waitroom.conf)
 2. 修改 `server_name`
 3. 修改 `admission_policy`
 4. 修改热点入口、排队接口、关键受保护路径

@@ -11,6 +11,7 @@
 它不仅解决 OpenResty 如何启动，也解决后续怎么维护：
 
 - 域名路由按站点文件拆分
+- 所有站点子配置直接平铺在 `openresty/conf.d/`，避免额外目录层级
 - 通用代理与 TLS 配置收敛到 snippets
 - 日志、缓存、证书、ACME 状态都能在磁盘上直接看到
 - 证书生命周期统一放在 `ssl/` 目录维护
@@ -45,7 +46,7 @@
 这部分实现位于：
 
 - [openresty/lua/admission](/data/openresty-install/openresty/lua/admission)
-- [openresty/conf.d/sites/case-enroll-waitroom.conf](/data/openresty-install/openresty/conf.d/sites/case-enroll-waitroom.conf)
+- [openresty/conf.d/case-enroll-waitroom.conf](/data/openresty-install/openresty/conf.d/case-enroll-waitroom.conf)
 - [examples/waitroom-best-practice.md](/data/openresty-install/examples/waitroom-best-practice.md)
 
 这一层的目标不是“让所有人都能冲进后端”，而是：
@@ -86,7 +87,7 @@ Internet -> OpenResty
                   └── static.example.com -> static files / object storage / upstream
 ```
 
-为什么按 `conf.d/sites/*.conf` 拆分：
+为什么按 `conf.d/*.conf` 平铺拆分：
 
 - 每个域名可以独立变更
 - 一份文件对应一个业务入口，认知成本低
@@ -150,7 +151,14 @@ Internet -> OpenResty
 │   ├── conf.d/
 │   │   ├── 00-global.conf
 │   │   ├── 01-upstreams.conf
-│   │   └── sites/
+│   │   ├── example-www.conf
+│   │   ├── example-api.conf
+│   │   ├── example-admin.conf
+│   │   ├── example-static.conf
+│   │   ├── case-risk-gateway.conf
+│   │   ├── case-partner-api.conf
+│   │   ├── case-gray-release.conf
+│   │   └── case-enroll-waitroom.conf
 │   ├── snippets/
 │   ├── logs/
 │   ├── cache/
@@ -326,10 +334,7 @@ docker compose up -d openresty
 
 ### 主配置
 
-`openresty/nginx.conf` 负责 worker、events、日志格式、HTTP 基础优化，并通过两个 include 装载：
-
-- `openresty/conf.d/*.conf`
-- `openresty/conf.d/sites/*.conf`
+`openresty/nginx.conf` 负责 worker、events、日志格式、HTTP 基础优化，并装载 `openresty/conf.d/*.conf`。
 
 ### 全局配置
 
@@ -353,6 +358,12 @@ docker compose up -d openresty
 2. `443` 端口挂载证书并提供正式流量入口
 3. 引入共享 TLS 和安全头 snippets
 4. 保留当前站点自己的代理、缓存或限流逻辑
+
+额外约定：
+
+- `80` 端口的 HTTP server 只做 ACME challenge 和 301 跳转
+- HTTP 跳转 server 默认不写 access log
+- 正式业务日志只保留在 `443` 入口 server
 
 ### Snippets
 
@@ -379,13 +390,13 @@ docker compose up -d openresty
 
 ### 高级案例站点
 
-- [openresty/conf.d/sites/case-risk-gateway.conf](/data/openresty-install/openresty/conf.d/sites/case-risk-gateway.conf)
+- [openresty/conf.d/case-risk-gateway.conf](/data/openresty-install/openresty/conf.d/case-risk-gateway.conf)
   日常风控入口案例，覆盖限流、UA 风控、IP 黑白名单、失败重试和简单熔断。
-- [openresty/conf.d/sites/case-partner-api.conf](/data/openresty-install/openresty/conf.d/sites/case-partner-api.conf)
+- [openresty/conf.d/case-partner-api.conf](/data/openresty-install/openresty/conf.d/case-partner-api.conf)
   对接型 API 案例，覆盖 JWT、HMAC、Redis 合作方配置、统一请求 ID、Header / Body 改写和动态路由。
-- [openresty/conf.d/sites/case-gray-release.conf](/data/openresty-install/openresty/conf.d/sites/case-gray-release.conf)
+- [openresty/conf.d/case-gray-release.conf](/data/openresty-install/openresty/conf.d/case-gray-release.conf)
   灰度发布案例，覆盖 Header 灰度、按百分比灰度和 Redis 统一开关。
-- [openresty/conf.d/sites/case-enroll-waitroom.conf](/data/openresty-install/openresty/conf.d/sites/case-enroll-waitroom.conf)
+- [openresty/conf.d/case-enroll-waitroom.conf](/data/openresty-install/openresty/conf.d/case-enroll-waitroom.conf)
   第二阶段等待室案例，覆盖入口排队、准入通行证、关键步骤保护和通用可调阈值策略。
 
 ### 第二阶段策略怎么调
@@ -422,7 +433,7 @@ docker compose up -d openresty
 
 ## 如何新增一个生产域名
 
-1. 从 `openresty/conf.d/sites/` 里复制一个最接近的文件
+1. 从 `openresty/conf.d/` 里复制一个最接近的站点文件
 2. 修改 `server_name`
 3. 改成真实域名对应的证书路径
 4. 调整 `proxy_pass` 或静态资源 root
