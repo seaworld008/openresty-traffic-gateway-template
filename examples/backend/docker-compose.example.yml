@@ -1,0 +1,16 @@
+services:
+  frontend:
+    image: traefik/whoami:v1.11.0
+    restart: unless-stopped
+
+  api-service:
+    image: traefik/whoami:v1.11.0
+    restart: unless-stopped
+
+  admin-service:
+    image: traefik/whoami:v1.11.0
+    restart: unless-stopped
+
+  echo-service:
+    image: mccutchen/go-httpbin:2.21.0
+    restart: unless-stopped

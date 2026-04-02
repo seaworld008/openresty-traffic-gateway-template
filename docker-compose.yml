@@ -1,0 +1,96 @@
+services:
+  # 公网入口服务，所有网关状态都保留在当前仓库目录下。
+  openresty:
+    image: ${OPENRESTY_IMAGE:-openresty/openresty:1.29.2.2-1-bookworm-fat}
+    container_name: openresty-gateway
+    restart: unless-stopped
+    depends_on:
+      frontend:
+        condition: service_started
+      api-service:
+        condition: service_started
+      admin-service:
+        condition: service_started
+      echo-service:
+        condition: service_started
+    environment:
+      GATEWAY_REDIS_HOST: ${GATEWAY_REDIS_HOST:-redis}
+      GATEWAY_REDIS_PORT: ${GATEWAY_REDIS_PORT:-6379}
+      GATEWAY_REDIS_DB: ${GATEWAY_REDIS_DB:-0}
+      GATEWAY_REDIS_PASSWORD: ${GATEWAY_REDIS_PASSWORD:-}
+      GATEWAY_REDIS_TIMEOUT_MS: ${GATEWAY_REDIS_TIMEOUT_MS:-1000}
+      GATEWAY_METADATA_CACHE_TTL_SECONDS: ${GATEWAY_METADATA_CACHE_TTL_SECONDS:-10}
+      GATEWAY_GRAY_FLAG_CACHE_TTL_SECONDS: ${GATEWAY_GRAY_FLAG_CACHE_TTL_SECONDS:-2}
+      GATEWAY_RESPONSE_REWRITE_MAX_BYTES: ${GATEWAY_RESPONSE_REWRITE_MAX_BYTES:-262144}
+      GATEWAY_QUEUE_SECRET: ${GATEWAY_QUEUE_SECRET:-change-this-before-production}
+      GATEWAY_ADMISSION_COOKIE_NAME: ${GATEWAY_ADMISSION_COOKIE_NAME:-gw_admission}
+      GATEWAY_OPS_TOKEN: ${GATEWAY_OPS_TOKEN:-change-this-before-production}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./openresty/nginx.conf:/usr/local/openresty/nginx/conf/nginx.conf:ro
+      - ./openresty/conf.d:/etc/nginx/conf.d:ro
+      - ./openresty/snippets:/etc/nginx/snippets:ro
+      - ./openresty/lua:/etc/nginx/lua:ro
+      - ./openresty/logs:/var/log/openresty
+      - ./openresty/cache:/var/cache/openresty
+      - ./openresty/html:/usr/local/openresty/nginx/html:ro
+      - ./ssl/certbot/conf:/etc/letsencrypt
+      - ./ssl/certbot/www:/var/www/certbot
+    healthcheck:
+      test: ["CMD-SHELL", "openresty -t"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - gateway
+
+  # 证书运维工具容器，默认不随主栈启动。
+  # 证书申请与续签通过脚本显式触发，避免隐藏的后台行为。
+  certbot:
+    image: ${CERTBOT_IMAGE:-certbot/certbot:v5.4.0}
+    profiles: ["ops"]
+    working_dir: /workdir
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["trap exit TERM; while :; do sleep 3600; done"]
+    volumes:
+      - ./:/workdir
+      - ./ssl/certbot/conf:/etc/letsencrypt
+      - ./ssl/certbot/www:/var/www/certbot
+    networks:
+      - gateway
+
+  # 示例后端服务，便于仓库克隆后直接本机验证路由与代理行为。
+  frontend:
+    image: traefik/whoami:v1.11.0
+    container_name: gateway-frontend
+    restart: unless-stopped
+    networks:
+      - gateway
+
+  api-service:
+    image: traefik/whoami:v1.11.0
+    container_name: gateway-api
+    restart: unless-stopped
+    networks:
+      - gateway
+
+  admin-service:
+    image: traefik/whoami:v1.11.0
+    container_name: gateway-admin
+    restart: unless-stopped
+    networks:
+      - gateway
+
+  echo-service:
+    image: ${ECHO_BACKEND_IMAGE:-mccutchen/go-httpbin:2.21.0}
+    container_name: gateway-echo
+    restart: unless-stopped
+    networks:
+      - gateway
+
+networks:
+  gateway:
+    driver: bridge

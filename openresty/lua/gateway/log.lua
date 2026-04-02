@@ -1,0 +1,1 @@
+require("gateway.init").log()

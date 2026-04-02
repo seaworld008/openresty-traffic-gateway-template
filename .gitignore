@@ -1,0 +1,27 @@
+# 本地环境变量
+.env
+
+# Git 元数据
+.git/
+
+# OpenResty 运行时日志与缓存
+openresty/logs/*
+!openresty/logs/.gitkeep
+openresty/cache/*
+!openresty/cache/.gitkeep
+
+# ACME 与本地测试证书状态
+ssl/certbot/conf/*
+!ssl/certbot/conf/.gitkeep
+!ssl/certbot/conf/live/
+!ssl/certbot/conf/archive/
+ssl/certbot/conf/live/*
+ssl/certbot/conf/archive/*
+ssl/certbot/www/*
+!ssl/certbot/www/.gitkeep
+
+# 后续如有本地打包或编辑器产物，统一忽略
+*.log
+.DS_Store
+.idea/
+.vscode/

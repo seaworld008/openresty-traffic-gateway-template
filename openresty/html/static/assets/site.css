@@ -1,0 +1,35 @@
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(0, 127, 95, 0.2), transparent 30%),
+    linear-gradient(135deg, #f4f7f2, #e3ece5);
+  color: #153126;
+}
+
+.page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 120px 24px;
+}
+
+.eyebrow {
+  margin: 0 0 16px;
+  font-size: 13px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #2d6a4f;
+}
+
+h1 {
+  margin: 0 0 16px;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  line-height: 1.05;
+}
+
+p {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
