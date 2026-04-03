@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="format-detection" content="telephone=no,email=no,address=no">
     <title>报名排队中</title>
     <style>
       :root {
@@ -17,10 +18,14 @@
         --shadow: 0 20px 60px rgba(29, 48, 40, 0.08);
       }
 
+      * {
+        box-sizing: border-box;
+      }
+
       body {
         margin: 0;
         min-height: 100vh;
-        font-family: "Noto Serif SC", "Source Han Serif SC", "PingFang SC", "Microsoft YaHei", serif;
+        font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Helvetica Neue", Arial, sans-serif;
         background:
           radial-gradient(circle at 20% 20%, rgba(255, 183, 3, 0.18), transparent 30%),
           radial-gradient(circle at 85% 15%, rgba(22, 110, 74, 0.14), transparent 28%),
@@ -29,9 +34,12 @@
       }
 
       main {
+        width: 100%;
         max-width: 760px;
         margin: 0 auto;
-        padding: 96px 24px;
+        padding: 72px 20px 40px;
+        padding-top: calc(72px + env(safe-area-inset-top));
+        padding-bottom: calc(40px + env(safe-area-inset-bottom));
       }
 
       .hero {
@@ -52,6 +60,7 @@
 
       h1 {
         margin: 0 0 16px;
+        font-size: 2rem;
         font-size: clamp(2rem, 4vw, 3.5rem);
         line-height: 1.08;
         letter-spacing: 0.01em;
@@ -74,6 +83,7 @@
         background: var(--card-bg);
         border: 1px solid var(--card-border);
         box-shadow: var(--shadow);
+        -webkit-backdrop-filter: blur(12px);
         backdrop-filter: blur(12px);
       }
 
@@ -133,11 +143,35 @@
         font-size: 13px;
       }
 
-      @media (max-width: 640px) {
+      @media (max-width: 480px) {
         main {
-          padding: 72px 20px;
+          padding: 56px 16px 32px;
+          padding-top: calc(56px + env(safe-area-inset-top));
+          padding-bottom: calc(32px + env(safe-area-inset-bottom));
         }
 
+        .label {
+          margin-bottom: 14px;
+        }
+
+        h1 {
+          line-height: 1.14;
+        }
+
+        .intro {
+          font-size: 0.98rem;
+        }
+
+        .metric {
+          font-size: 2.6rem;
+        }
+
+        .tips {
+          font-size: 13px;
+        }
+      }
+
+      @media (max-width: 640px) {
         .card {
           padding: 20px;
           border-radius: 18px;
@@ -166,54 +200,86 @@
       </div>
     </main>
     <script>
-      const params = new URLSearchParams(window.location.search);
-      const ticket = params.get("ticket");
-      const userId = params.get("user_id");
-      const aheadNode = document.getElementById("ahead");
-      const statusNode = document.getElementById("status");
-
-      async function poll() {
-        if (!ticket || !userId) {
-          aheadNode.textContent = "-";
-          statusNode.textContent = "当前排队凭证尚未准备好，请返回原页面后重新进入。";
-          return;
+      (function () {
+        function getQueryParam(name) {
+          var pattern = new RegExp("(?:[?&])" + name + "=([^&]*)");
+          var match = pattern.exec(window.location.search || "");
+          return match ? decodeURIComponent(match[1].replace(/\+/g, " ")) : "";
         }
 
-        const response = await fetch(`/api/queue/status?ticket=${encodeURIComponent(ticket)}&user_id=${encodeURIComponent(userId)}`, {
-          headers: {
-            "X-User-Id": userId,
-          },
-          credentials: "include",
-        });
-
-        if (!response.ok) {
-          throw new Error(`http_${response.status}`);
+        function setStatus(aheadText, statusText) {
+          aheadNode.textContent = aheadText;
+          statusNode.textContent = statusText;
         }
 
-        const data = await response.json();
+        function requestStatus(onSuccess, onError) {
+          var xhr = new XMLHttpRequest();
+          var requestUrl = "/api/queue/status?ticket=" + encodeURIComponent(ticket) + "&user_id=" + encodeURIComponent(userId);
 
-        if (data.status === "admitted") {
-          aheadNode.textContent = "0";
-          statusNode.textContent = "已为你安排进入，请返回原页面继续后续报名流程。";
-          return;
+          xhr.open("GET", requestUrl, true);
+          xhr.withCredentials = true;
+          xhr.setRequestHeader("X-User-Id", userId);
+          xhr.onreadystatechange = function () {
+            var data;
+
+            if (xhr.readyState !== 4) {
+              return;
+            }
+
+            if (xhr.status < 200 || xhr.status >= 300) {
+              onError("http_" + xhr.status);
+              return;
+            }
+
+            try {
+              data = JSON.parse(xhr.responseText || "{}");
+            } catch (error) {
+              onError("invalid_json");
+              return;
+            }
+
+            onSuccess(data);
+          };
+          xhr.onerror = function () {
+            onError("network_error");
+          };
+          xhr.send(null);
         }
 
-        if (data.status !== "queued") {
-          aheadNode.textContent = "-";
-          statusNode.textContent = "当前状态正在更新，请稍后返回原页面重新查看。";
-          return;
+        function poll() {
+          if (!ticket || !userId) {
+            setStatus("-", "当前排队凭证尚未准备好，请返回原页面后重新进入。");
+            return;
+          }
+
+          requestStatus(function (data) {
+            if (data.status === "admitted") {
+              setStatus("0", "已为你安排进入，请返回原页面继续后续报名流程。");
+              return;
+            }
+
+            if (data.status !== "queued") {
+              setStatus("-", "当前状态正在更新，请稍后返回原页面重新查看。");
+              return;
+            }
+
+            setStatus(String(data.ahead_count != null ? data.ahead_count : "-"), "正在排队中，建议 " + (data.poll_after_seconds || 3) + " 秒后再查看最新状态。");
+            setTimeout(poll, (data.poll_after_seconds || 3) * 1000);
+          }, function (error) {
+            setStatus("-", "当前状态获取失败，请稍后再试，或返回原页面重新进入。");
+            if (window.console && window.console.error) {
+              window.console.error("waitroom poll failed:", error);
+            }
+          });
         }
 
-        aheadNode.textContent = String(data.ahead_count ?? "-");
-        statusNode.textContent = `正在排队中，建议 ${data.poll_after_seconds ?? 3} 秒后再查看最新状态。`;
-        setTimeout(poll, ((data.poll_after_seconds ?? 3) * 1000));
-      }
+        var ticket = getQueryParam("ticket");
+        var userId = getQueryParam("user_id");
+        var aheadNode = document.getElementById("ahead");
+        var statusNode = document.getElementById("status");
 
-      poll().catch((error) => {
-        aheadNode.textContent = "-";
-        statusNode.textContent = "当前状态获取失败，请稍后再试，或返回原页面重新进入。";
-        console.error("waitroom poll failed:", error);
-      });
+        poll();
+      })();
     </script>
   </body>
 </html>
