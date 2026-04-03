@@ -58,21 +58,41 @@
 
 ```bash
 cp openresty/conf.d/frontend-proxy.conf.example openresty/conf.d/frontend-proxy.conf
+sed -i 's/REPLACE_WITH_DOMAIN/www.example.com/g' openresty/conf.d/frontend-proxy.conf
 ```
 
 例如启用热点活动等待室模板：
 
 ```bash
 cp openresty/conf.d/waitroom-enrollment-gateway.conf.example openresty/conf.d/waitroom-enrollment-gateway.conf
+sed -i 's/REPLACE_WITH_DOMAIN/enroll.example.com/g' openresty/conf.d/waitroom-enrollment-gateway.conf
 ```
 
 复制后请按实际情况修改：
 
 - `server_name`
-- `ssl_certificate` / `ssl_certificate_key`
+- 证书路径（默认已跟随同一个域名占位符）
 - `proxy_pass`
 - `gateway_policy` / `admission_policy`
 - 日志文件名
+
+## 4.1 一键按域名生成模板
+
+如果你希望直接生成一份可编辑配置，可以使用：
+
+```bash
+cd openresty/conf.d
+./confctl.sh new frontend-proxy.conf.example www.example.com
+```
+
+或：
+
+```bash
+cd openresty/conf.d
+./confctl.sh new waitroom-enrollment-gateway.conf.example enroll.example.com enroll-campus-a.conf
+```
+
+模板里统一使用 `REPLACE_WITH_DOMAIN` 占位符，所以对于同类型站点，替换一次域名就可以得到一份基本可用的配置骨架。
 
 ### 本地测试时批量启用
 
