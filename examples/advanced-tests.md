@@ -19,9 +19,18 @@
 
 ```bash
 make init
+sed -i 's|^GATEWAY_REDIS_PASSWORD=.*|GATEWAY_REDIS_PASSWORD=openresty-test-redis-pass|' .env
 ./ssl/scripts/init-local-certs.sh
-docker compose up -d
+bash examples/scripts/activate_conf_examples.sh
+docker compose -f docker-compose.yml -f examples/backend/docker-compose.local.yml up -d
 ```
+
+说明：
+
+- `docker-compose.yml` 只启动 OpenResty 主栈
+- 第一层高级能力案例依赖 `examples/backend/docker-compose.local.yml` 中的示例后端
+- `activate_conf_examples.sh` 会批量启用 `risk`、`partner`、`gray` 等示例站点配置
+- `GATEWAY_REDIS_PASSWORD` 需要在 OpenResty 容器启动前写入 `.env`
 
 2. 再启动一个仓库外的本机 Redis 容器，挂到当前 Compose 网络，并启用密码：
 
@@ -31,10 +40,16 @@ docker run -d --name openresty-local-redis --network openresty-install_gateway -
   redis:7.2.5-alpine redis-server --requirepass openresty-test-redis-pass
 ```
 
-3. 确保 `.env` 中设置：
+3. 再确认 `.env` 中设置：
 
 ```bash
 GATEWAY_REDIS_PASSWORD=openresty-test-redis-pass
+```
+
+如果你是在容器已经启动后才改的 `.env`，请补一条：
+
+```bash
+docker compose restart openresty
 ```
 
 4. 把测试数据写入 Redis：
@@ -50,6 +65,12 @@ docker exec -e REDISCLI_AUTH=openresty-test-redis-pass openresty-local-redis red
 - `risk-gateway.example.test`
 - `partner-api.example.test`
 - `gray-release.example.test`
+
+测试完成后，如需恢复模板状态，可执行：
+
+```bash
+bash examples/scripts/deactivate_conf_examples.sh
+```
 
 ## 案例 1：风控与稳定性网关
 

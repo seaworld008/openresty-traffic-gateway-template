@@ -278,7 +278,13 @@ make init
 ./ssl/scripts/init-local-certs.sh
 ```
 
-再启动整套服务：
+再启用示例站点模板：
+
+```bash
+bash examples/scripts/activate_conf_examples.sh
+```
+
+然后启动整套服务：
 
 ```bash
 docker compose -f docker-compose.yml -f examples/backend/docker-compose.local.yml up -d
@@ -289,6 +295,12 @@ docker compose -f docker-compose.yml -f examples/backend/docker-compose.local.ym
 ```bash
 make up-local
 ```
+
+说明：
+
+- `docker-compose.yml` 只启动 OpenResty 主栈
+- 示例后端位于 `examples/backend/docker-compose.local.yml`
+- `examples/scripts/activate_conf_examples.sh` 会把所有 `*.conf.example` 批量生成对应 `.conf`，方便本地验证
 
 执行配置校验：
 
@@ -310,6 +322,12 @@ cd openresty/conf.d
 ```
 
 然后按 [examples/curl-tests.md](/data/openresty-install/examples/curl-tests.md) 中的步骤做验证。
+
+本地验证结束后，如需恢复干净模板状态，可执行：
+
+```bash
+bash examples/scripts/deactivate_conf_examples.sh
+```
 
 ### 3. 生产证书申请
 

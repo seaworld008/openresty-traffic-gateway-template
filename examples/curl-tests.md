@@ -2,6 +2,23 @@
 
 这些命令已经在本仓库于 `2026-04-03` 本机重新执行验证通过。
 
+## 0. 测试前提
+
+在执行下面的 `curl` 之前，请先完成：
+
+```bash
+make init
+./ssl/scripts/init-local-certs.sh
+bash examples/scripts/activate_conf_examples.sh
+docker compose -f docker-compose.yml -f examples/backend/docker-compose.local.yml up -d
+```
+
+说明：
+
+- `docker-compose.yml` 只负责 OpenResty 主栈
+- 示例后端在 `examples/backend/docker-compose.local.yml`
+- 如果不启用 `*.conf.example` 对应的 `.conf`，下面这些域名路由默认不会生效
+
 ## 1. 准备域名解析
 
 可以把下面这些记录写入 `/etc/hosts`：
@@ -64,3 +81,9 @@ curl -i http://127.0.0.1/healthz
 ## 6. 高级能力案例
 
 高级能力测试请参考 [examples/advanced-tests.md](/data/openresty-install/examples/advanced-tests.md)。
+
+测试完成后，如需清理示例配置，可执行：
+
+```bash
+bash examples/scripts/deactivate_conf_examples.sh
+```
