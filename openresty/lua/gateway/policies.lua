@@ -11,8 +11,10 @@ return {
             {
                 id = "risk_unstable",
                 path_prefix = "/unstable",
-                upstream = "http://127.0.0.1:65535",
-                fallback_upstream = "http://frontend:80",
+                upstream = "risk_unstable_backend",
+                upstream_uri = "/unstable",
+                fallback_upstream = "frontend_backend",
+                fallback_upstream_uri = "/unstable",
                 circuit_breaker = {
                     failure_threshold = 2,
                     open_seconds = 20,
@@ -22,7 +24,7 @@ return {
             {
                 id = "risk_allowlist",
                 path_prefix = "/allowlist",
-                upstream = "http://frontend:80",
+                upstream = "frontend_backend",
                 risk = {
                     whitelist_ips = {
                         "203.0.113.10/32",
@@ -32,7 +34,7 @@ return {
             {
                 id = "risk_denylist",
                 path_prefix = "/denylist",
-                upstream = "http://frontend:80",
+                upstream = "frontend_backend",
                 risk = {
                     blacklist_ips = {
                         "198.51.100.24/32",
@@ -42,7 +44,7 @@ return {
             {
                 id = "risk_default",
                 path_prefix = "/",
-                upstream = "http://frontend:80",
+                upstream = "frontend_backend",
                 response_rewrite = {
                     add_headers = {
                         ["X-Gateway-Case"] = "risk-gateway",
@@ -62,7 +64,8 @@ return {
             {
                 id = "partner_hook_inventory",
                 path_prefix = "/v1/hooks/inventory",
-                upstream = "http://echo-service:8080/anything/hooks/inventory",
+                upstream = "echo_backend",
+                upstream_uri = "/anything/hooks/inventory",
                 partner_metadata_key_prefix = "gateway:partner:",
                 auth = {
                     require_partner_key = true,
@@ -92,7 +95,8 @@ return {
             {
                 id = "partner_orders",
                 path_prefix = "/v1/orders",
-                upstream = "http://echo-service:8080/anything/orders",
+                upstream = "echo_backend",
+                upstream_uri = "/anything/orders",
                 partner_metadata_key_prefix = "gateway:partner:",
                 auth = {
                     require_partner_key = true,
@@ -126,7 +130,7 @@ return {
             {
                 id = "partner_dispatch",
                 path_prefix = "/v1/dispatch",
-                upstream = "http://api-service:80",
+                upstream = "api_backend",
                 partner_metadata_key_prefix = "gateway:partner:",
                 auth = {
                     require_partner_key = true,
@@ -134,7 +138,10 @@ return {
                 },
                 header_upstreams = {
                     ["X-Route-Version"] = {
-                        echo = "http://echo-service:8080/anything/dispatch",
+                        echo = {
+                            upstream = "echo_backend",
+                            upstream_uri = "/anything/dispatch",
+                        },
                     },
                 },
                 response_rewrite = {
@@ -146,7 +153,7 @@ return {
             {
                 id = "partner_default",
                 path_prefix = "/",
-                upstream = "http://api-service:80",
+                upstream = "api_backend",
             },
         },
     },
@@ -155,13 +162,14 @@ return {
             {
                 id = "gray_release",
                 path_prefix = "/",
-                upstream = "http://frontend:80",
+                upstream = "frontend_backend",
                 gray = {
                     header_name = "X-Gray-Release",
                     cookie_name = "gray_release",
                     canary_value = "canary",
-                    canary_upstream = "http://echo-service:8080/anything/gray-release",
-                    stable_upstream = "http://frontend:80",
+                    canary_upstream = "echo_backend",
+                    canary_upstream_uri = "/anything/gray-release",
+                    stable_upstream = "frontend_backend",
                     percent = 20,
                     redis_flag_key = "gateway:gray:enabled",
                 },

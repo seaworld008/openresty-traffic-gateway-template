@@ -24,17 +24,17 @@ end
 
 local function resolve_header_route(route)
     if type(route.header_upstreams) ~= "table" then
-        return route.upstream
+        return route.upstream, route.upstream_uri
     end
 
     for header_name, values in pairs(route.header_upstreams) do
         local header_value = ngx.req.get_headers()[header_name]
         if header_value and values[header_value] then
-            return values[header_value], header_name, header_value
+            return values[header_value].upstream, values[header_value].upstream_uri, header_name, header_value
         end
     end
 
-    return route.upstream
+    return route.upstream, route.upstream_uri
 end
 
 local function redis_gray_enabled(route)
@@ -66,11 +66,11 @@ end
 
 local function resolve_gray(route)
     if type(route.gray) ~= "table" then
-        return route.upstream, "stable"
+        return route.upstream, route.upstream_uri, "stable"
     end
 
     if not redis_gray_enabled(route) then
-        return route.gray.stable_upstream or route.upstream, "stable"
+        return route.gray.stable_upstream or route.upstream, route.gray.stable_upstream_uri or route.upstream_uri, "stable"
     end
 
     local headers = ngx.req.get_headers()
@@ -78,18 +78,18 @@ local function resolve_gray(route)
     local cookie_name = route.gray.cookie_name
 
     if header_name and headers[header_name] == route.gray.canary_value then
-        return route.gray.canary_upstream, "canary"
+        return route.gray.canary_upstream, route.gray.canary_upstream_uri, "canary"
     end
 
     if cookie_name and util.cookie_value(cookie_name) == route.gray.canary_value then
-        return route.gray.canary_upstream, "canary"
+        return route.gray.canary_upstream, route.gray.canary_upstream_uri, "canary"
     end
 
     if route.gray.percent and util.choose_percent(route.gray.percent) then
-        return route.gray.canary_upstream, "canary"
+        return route.gray.canary_upstream, route.gray.canary_upstream_uri, "canary"
     end
 
-    return route.gray.stable_upstream or route.upstream, "stable"
+    return route.gray.stable_upstream or route.upstream, route.gray.stable_upstream_uri or route.upstream_uri, "stable"
 end
 
 function M.select(policy)
@@ -99,13 +99,14 @@ function M.select(policy)
     end
 
     local upstream = route.upstream
+    local upstream_uri = route.upstream_uri or ngx.var.request_uri
     local route_source = "static"
 
     if route.gray then
-        upstream, ngx.ctx.gateway_gray_variant = resolve_gray(route)
+        upstream, upstream_uri, ngx.ctx.gateway_gray_variant = resolve_gray(route)
         route_source = "gray"
     else
-        upstream, ngx.ctx.gateway_route_decision_header, ngx.ctx.gateway_route_decision_value = resolve_header_route(route)
+        upstream, upstream_uri, ngx.ctx.gateway_route_decision_header, ngx.ctx.gateway_route_decision_value = resolve_header_route(route)
         ngx.ctx.gateway_gray_variant = "stable"
         if ngx.ctx.gateway_route_decision_header then
             route_source = "header"
@@ -115,8 +116,10 @@ function M.select(policy)
     return {
         id = route.id,
         upstream = upstream,
+        upstream_uri = upstream_uri or ngx.var.request_uri,
         route_source = route_source,
         fallback_upstream = route.fallback_upstream,
+        fallback_upstream_uri = route.fallback_upstream_uri or ngx.var.request_uri,
         circuit_breaker = route.circuit_breaker,
         auth = route.auth or {},
         request_rewrite = route.request_rewrite,

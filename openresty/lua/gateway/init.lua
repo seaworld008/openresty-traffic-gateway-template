@@ -130,6 +130,7 @@ function M.access()
     enforce_auth(route)
 
     local selected_upstream = route.upstream
+    local selected_upstream_uri = route.upstream_uri or ngx.var.request_uri
 
     if route.circuit_breaker and circuit_breaker.is_open(route.id) then
         ngx.var.gateway_circuit_state = "open"
@@ -137,6 +138,7 @@ function M.access()
 
         if route.fallback_upstream then
             selected_upstream = route.fallback_upstream
+            selected_upstream_uri = route.fallback_upstream_uri or ngx.var.request_uri
         else
             return util.exit_json(503, "circuit_open", "上游熔断已开启")
         end
@@ -145,6 +147,7 @@ function M.access()
     end
 
     ngx.var.gateway_upstream = selected_upstream
+    ngx.var.gateway_upstream_uri = selected_upstream_uri
     ngx.ctx.response_rewrite = route.response_rewrite
 
     rewrite.apply_request_rewrite(route.request_rewrite)
