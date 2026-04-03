@@ -39,7 +39,7 @@
 - `llm-api-proxy.conf.example`
   通用大模型 API 反向代理
 - `llm-relay-token-guard.conf.example`
-  大模型中转 API 的源站令牌保护
+  大模型中转 API 的源站令牌保护，使用 `map` 做本机与源站令牌判断
 
 ### OpenResty 第二阶段等待室场景
 

@@ -10,6 +10,24 @@
 # - X-Origin-Token 的密钥值
 # - 日志文件名
 
+map $remote_addr $llm_relay_is_local {
+    default 0;
+    127.0.0.1 1;
+    ::1 1;
+}
+
+map $http_x_origin_token $llm_relay_origin_ok {
+    default 0;
+    "REPLACE_WITH_LONG_RANDOM_TOKEN" 1;
+}
+
+map "$llm_relay_is_local:$llm_relay_origin_ok" $llm_relay_access_ok {
+    default 0;
+    "1:0" 1;
+    "1:1" 1;
+    "0:1" 1;
+}
+
 upstream llm_relay_backend {
     zone llm_relay_backend 64k;
     server 127.0.0.1:8080 max_fails=3 fail_timeout=15s;
@@ -32,7 +50,7 @@ server {
 }
 
 server {
-    listen 443 ssl;
+    listen 443 ssl reuseport;
     http2 on;
     server_name llm-relay.example.com;
 
@@ -48,13 +66,8 @@ server {
     keepalive_timeout 65s;
     keepalive_requests 10000;
 
-    set $llm_relay_access_ok 0;
-    if ($remote_addr = 127.0.0.1) { set $llm_relay_access_ok 1; }
-    if ($remote_addr = ::1) { set $llm_relay_access_ok 1; }
-    if ($http_x_origin_token = "REPLACE_WITH_LONG_RANDOM_TOKEN") { set $llm_relay_access_ok 1; }
-
     location = /healthz {
-        if ($llm_relay_access_ok = 0) { return 403; }
+        if ($llm_relay_is_local = 0) { return 403; }
         default_type text/plain;
         return 200 "ok\n";
     }
