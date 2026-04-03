@@ -169,6 +169,7 @@ curl -k \
 1. `make check`
 2. `make ps`
 3. 确认外部 Redis 可连接
+   测试环境也建议按带密码模式验证，不要只验证无密码 Redis
 4. 确认等待室策略参数与当前系统容量匹配
 5. 确认 `GATEWAY_OPS_TOKEN`、`GATEWAY_QUEUE_SECRET` 已替换默认值
 6. 跑一遍：

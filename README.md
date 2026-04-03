@@ -668,5 +668,6 @@ make down-local
 - `gray-release.example.test` 已验证灰度命中与 Redis 统一关闭灰度
 - `enroll.example.test` 已验证等待室入口、准入通行证、关键路径保护和排队补位
 - 综合验证中的第一层并发压测、等待室并发模拟与等待室摘要查询全部通过
+- 本地自动化测试中的 Redis 已按带密码模式验证通过
 
 高级能力测试命令与说明见 [examples/advanced-tests.md](/data/openresty-install/examples/advanced-tests.md)。

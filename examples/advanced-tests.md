@@ -23,21 +23,29 @@ make init
 docker compose up -d
 ```
 
-2. 再启动一个仓库外的本机 Redis 容器，挂到当前 Compose 网络：
+2. 再启动一个仓库外的本机 Redis 容器，挂到当前 Compose 网络，并启用密码：
 
 ```bash
-make redis-test-up
+docker rm -f openresty-local-redis >/dev/null 2>&1 || true
+docker run -d --name openresty-local-redis --network openresty-install_gateway --network-alias redis \
+  redis:7.2.5-alpine redis-server --requirepass openresty-test-redis-pass
 ```
 
-3. 把测试数据写入 Redis：
+3. 确保 `.env` 中设置：
 
 ```bash
-docker exec openresty-local-redis redis-cli SET gateway:gray:enabled 1
-docker exec openresty-local-redis redis-cli SET gateway:partner:test-client \
+GATEWAY_REDIS_PASSWORD=openresty-test-redis-pass
+```
+
+4. 把测试数据写入 Redis：
+
+```bash
+docker exec -e REDISCLI_AUTH=openresty-test-redis-pass openresty-local-redis redis-cli SET gateway:gray:enabled 1
+docker exec -e REDISCLI_AUTH=openresty-test-redis-pass openresty-local-redis redis-cli SET gateway:partner:test-client \
   '{"tenant":"acme","jwt_secret":"partner-jwt-secret","hmac_secret":"partner-hmac-secret"}'
 ```
 
-4. 保证本机 hosts 或 `curl --resolve` 已覆盖以下域名：
+5. 保证本机 hosts 或 `curl --resolve` 已覆盖以下域名：
 
 - `risk-gateway.example.test`
 - `partner-api.example.test`

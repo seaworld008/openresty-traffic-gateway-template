@@ -251,6 +251,15 @@ make reload
 
 如果不能可靠透传，就不要启用。
 
+## 8.1 测试环境 Redis 建议
+
+本仓库的自动化测试脚本已经支持并默认使用带密码 Redis。
+如果你要模拟更接近生产的环境，建议保持：
+
+- `GATEWAY_REDIS_PASSWORD` 非空
+- Redis 通过 `requirepass` 启动
+- 测试写入数据时使用认证后的 `redis-cli`
+
 ## 9. 如何回滚
 
 ### 回滚配置

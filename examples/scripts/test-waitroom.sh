@@ -8,6 +8,19 @@ REPO_ROOT=$(cd "${SCRIPT_DIR}/../.." && pwd)
 cd "${REPO_ROOT}"
 
 COMPOSE_LOCAL=(docker compose -f docker-compose.yml -f examples/backend/docker-compose.local.yml)
+TEST_REDIS_PASSWORD="${TEST_REDIS_PASSWORD:-openresty-test-redis-pass}"
+
+set_env_value() {
+  local file="$1"
+  local key="$2"
+  local value="$3"
+
+  if grep -q "^${key}=" "${file}"; then
+    sed -i "s|^${key}=.*|${key}=${value}|" "${file}"
+  else
+    printf '%s=%s\n' "${key}" "${value}" >> "${file}"
+  fi
+}
 
 require_cmd() {
   if ! command -v "$1" >/dev/null 2>&1; then
@@ -28,6 +41,7 @@ cleanup() {
 trap cleanup EXIT
 
 cp -f .env.example .env
+set_env_value .env GATEWAY_REDIS_PASSWORD "${TEST_REDIS_PASSWORD}"
 chmod +x ssl/scripts/*.sh
 ./ssl/scripts/init-local-certs.sh >/dev/null
 rm -f openresty/conf.d/10-real-ip.conf
@@ -42,7 +56,8 @@ docker compose restart openresty >/dev/null
 sleep 2
 
 docker rm -f openresty-local-redis >/dev/null 2>&1 || true
-docker run -d --name openresty-local-redis --network openresty-install_gateway --network-alias redis redis:7.2.5-alpine >/dev/null
+docker run -d --name openresty-local-redis --network openresty-install_gateway --network-alias redis \
+  redis:7.2.5-alpine redis-server --requirepass "${TEST_REDIS_PASSWORD}" >/dev/null
 sleep 1
 docker compose exec -T openresty openresty -t >/dev/null
 

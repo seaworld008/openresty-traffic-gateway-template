@@ -39,6 +39,12 @@ def post_join(user_id: str) -> dict:
             "payload_status": payload.get("status"),
             "ticket_id": payload.get("ticket_id"),
         }
+    except urllib.error.URLError:
+        return {
+            "status_code": 599,
+            "payload_status": "transport_error",
+            "ticket_id": None,
+        }
 
 
 def main():

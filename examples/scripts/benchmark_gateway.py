@@ -9,6 +9,7 @@ import ssl
 import statistics
 import threading
 import time
+import urllib.error
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -41,6 +42,8 @@ def run_case(name: str, method: str, url: str, headers: dict, body: bytes | None
         except urllib.error.HTTPError as exc:
             exc.read()
             status = exc.code
+        except urllib.error.URLError:
+            status = 599
         elapsed = time.perf_counter() - started
         with status_lock:
             latencies.append(elapsed)
