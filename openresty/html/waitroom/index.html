@@ -5,14 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>报名排队中</title>
     <style>
+      :root {
+        --bg-start: #f6f4ef;
+        --bg-end: #e5efe5;
+        --text-main: #183028;
+        --text-subtle: #587166;
+        --accent: #176d4a;
+        --accent-soft: rgba(23, 109, 74, 0.12);
+        --card-bg: rgba(255, 255, 255, 0.78);
+        --card-border: rgba(23, 109, 74, 0.08);
+        --shadow: 0 20px 60px rgba(29, 48, 40, 0.08);
+      }
+
       body {
         margin: 0;
         min-height: 100vh;
-        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-family: "Noto Serif SC", "Source Han Serif SC", "PingFang SC", "Microsoft YaHei", serif;
         background:
           radial-gradient(circle at 20% 20%, rgba(255, 183, 3, 0.18), transparent 30%),
-          linear-gradient(135deg, #f6f4ef, #e8efe6);
-        color: #183028;
+          radial-gradient(circle at 85% 15%, rgba(22, 110, 74, 0.14), transparent 28%),
+          linear-gradient(135deg, var(--bg-start), var(--bg-end));
+        color: var(--text-main);
       }
 
       main {
@@ -21,13 +34,17 @@
         padding: 96px 24px;
       }
 
+      .hero {
+        position: relative;
+      }
+
       .label {
         display: inline-block;
         margin-bottom: 16px;
         padding: 6px 10px;
         border-radius: 999px;
-        background: rgba(22, 110, 74, 0.12);
-        color: #166e4a;
+        background: var(--accent-soft);
+        color: var(--accent);
         font-size: 12px;
         letter-spacing: 0.08em;
         text-transform: uppercase;
@@ -36,7 +53,8 @@
       h1 {
         margin: 0 0 16px;
         font-size: clamp(2rem, 4vw, 3.5rem);
-        line-height: 1.02;
+        line-height: 1.08;
+        letter-spacing: 0.01em;
       }
 
       p {
@@ -44,42 +62,107 @@
         line-height: 1.7;
       }
 
+      .intro {
+        max-width: 640px;
+        font-size: 1.04rem;
+      }
+
       .card {
         margin-top: 32px;
         padding: 24px;
         border-radius: 20px;
-        background: rgba(255, 255, 255, 0.72);
-        box-shadow: 0 18px 60px rgba(29, 48, 40, 0.08);
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        box-shadow: var(--shadow);
         backdrop-filter: blur(12px);
       }
 
+      .eyebrow {
+        margin-bottom: 10px;
+        color: var(--accent);
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+      }
+
       .metric {
-        margin: 0;
-        font-size: 42px;
+        margin: 8px 0 2px;
+        font-size: clamp(2.4rem, 6vw, 3.5rem);
         font-weight: 700;
+        line-height: 1;
       }
 
       .muted {
-        color: #557368;
+        color: var(--text-subtle);
         font-size: 14px;
       }
 
-      code {
-        background: rgba(0, 0, 0, 0.05);
-        padding: 2px 6px;
-        border-radius: 6px;
+      #status {
+        margin-top: 16px;
+        font-size: 1rem;
+      }
+
+      .tips {
+        margin: 22px 0 0;
+        padding: 0;
+        list-style: none;
+        color: var(--text-subtle);
+        font-size: 14px;
+      }
+
+      .tips li {
+        margin-top: 8px;
+        padding-left: 18px;
+        position: relative;
+      }
+
+      .tips li::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 10px;
+        width: 6px;
+        height: 6px;
+        border-radius: 999px;
+        background: rgba(23, 109, 74, 0.45);
+      }
+
+      .status-note {
+        margin-top: 18px;
+        color: var(--text-subtle);
+        font-size: 13px;
+      }
+
+      @media (max-width: 640px) {
+        main {
+          padding: 72px 20px;
+        }
+
+        .card {
+          padding: 20px;
+          border-radius: 18px;
+        }
       }
     </style>
   </head>
   <body>
     <main>
-      <span class="label">Waitroom</span>
-      <h1>系统繁忙，正在排队进入报名流程。</h1>
-      <p>当系统处于安全负载内时，已拿到准入资格的用户可以继续完成加车、确认和支付，避免关键步骤被随机限流打断。</p>
+      <section class="hero">
+        <span class="label">报名排队中</span>
+        <h1>当前报名火热，正在有序排队进入。</h1>
+        <p class="intro">为保障报名过程顺畅，系统会按顺序安排进入。轮到你时，可继续后续确认与支付流程，无需重复提交。</p>
+      </section>
       <div class="card">
-        <p class="metric" id="ahead">-</p>
+        <p class="eyebrow">当前排队状态</p>
+        <p class="metric" id="ahead" aria-live="polite">-</p>
         <p class="muted">前方预计人数</p>
-        <p id="status">请从业务前端带上 <code>ticket</code> 和 <code>X-User-Id</code> 轮询 <code>/api/queue/status</code>。</p>
+        <p id="status" aria-live="polite">正在为你确认排队状态，请稍候。</p>
+        <ul class="tips">
+          <li>请尽量保持当前页面，不要频繁刷新或重复提交。</li>
+          <li>轮到你时，系统会自动更新状态，你可以继续报名流程。</li>
+          <li>若等待时间较长，也请放心，当前只是按顺序安排进入，并非系统故障。</li>
+        </ul>
+        <p class="status-note">如当前页面来自业务系统跳转，请优先返回原页面继续操作，不必重复进入。</p>
       </div>
     </main>
     <script>
@@ -91,7 +174,8 @@
 
       async function poll() {
         if (!ticket || !userId) {
-          statusNode.textContent = "缺少 ticket 或 user_id，无法自动轮询。";
+          aheadNode.textContent = "-";
+          statusNode.textContent = "当前排队凭证尚未准备好，请返回原页面后重新进入。";
           return;
         }
 
@@ -101,21 +185,34 @@
           },
           credentials: "include",
         });
+
+        if (!response.ok) {
+          throw new Error(`http_${response.status}`);
+        }
+
         const data = await response.json();
 
         if (data.status === "admitted") {
           aheadNode.textContent = "0";
-          statusNode.textContent = "已获得准入资格，请返回业务页面继续购物车和支付流程。";
+          statusNode.textContent = "已为你安排进入，请返回原页面继续后续报名流程。";
+          return;
+        }
+
+        if (data.status !== "queued") {
+          aheadNode.textContent = "-";
+          statusNode.textContent = "当前状态正在更新，请稍后返回原页面重新查看。";
           return;
         }
 
         aheadNode.textContent = String(data.ahead_count ?? "-");
-        statusNode.textContent = `排队中，建议 ${data.poll_after_seconds ?? 3} 秒后再刷新一次。`;
+        statusNode.textContent = `正在排队中，建议 ${data.poll_after_seconds ?? 3} 秒后再查看最新状态。`;
         setTimeout(poll, ((data.poll_after_seconds ?? 3) * 1000));
       }
 
       poll().catch((error) => {
-        statusNode.textContent = `排队状态查询失败：${error}`;
+        aheadNode.textContent = "-";
+        statusNode.textContent = "当前状态获取失败，请稍后再试，或返回原页面重新进入。";
+        console.error("waitroom poll failed:", error);
       });
     </script>
   </body>
