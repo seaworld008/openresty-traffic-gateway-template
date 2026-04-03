@@ -1,5 +1,11 @@
 # OpenResty 单节点网关最佳实践模板
 
+[![OpenResty](https://img.shields.io/badge/OpenResty-1.29.2.2--1--bookworm--fat-1f2937?logo=nginx&logoColor=white)](https://openresty.org/)
+[![Deploy](https://img.shields.io/badge/Deploy-Docker_Compose-2496ED?logo=docker&logoColor=white)](/data/openresty-install/docker-compose.yml)
+[![Redis](https://img.shields.io/badge/Redis-Password_Tested-DC382D?logo=redis&logoColor=white)](/data/openresty-install/examples/scripts/test-first-layer.sh)
+[![Examples](https://img.shields.io/badge/Examples-Non--LLM_Tested-success)](/data/openresty-install/examples/scripts/run_comprehensive_validation.sh)
+[![Last Commit](https://img.shields.io/github/last-commit/seaworld008/openresty-traffic-gateway-template/main?color=0f766e)](https://github.com/seaworld008/openresty-traffic-gateway-template/commits/main)
+
 这个仓库是一套面向中小团队的 OpenResty 自建部署模板，目标不是“能跑起来就行”，而是尽量贴近生产可维护实践：单台 Linux 主机、Docker Compose 部署、所有持久化状态都放在当前仓库目录、目录结构清晰，后续其他项目可以直接 clone 后快速启动。
 
 推荐 GitHub 中文描述：
