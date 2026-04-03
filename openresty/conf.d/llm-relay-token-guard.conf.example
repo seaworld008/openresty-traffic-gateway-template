@@ -11,17 +11,20 @@
 # - 日志文件名
 
 map $remote_addr $llm_relay_is_local {
+    # 本机直连默认放行，适合中转站和源站部署在同机的情况。
     default 0;
     127.0.0.1 1;
     ::1 1;
 }
 
 map $http_x_origin_token $llm_relay_origin_ok {
+    # 这里只是示例令牌，生产必须替换成足够长的随机值。
     default 0;
     "REPLACE_WITH_LONG_RANDOM_TOKEN" 1;
 }
 
 map "$llm_relay_is_local:$llm_relay_origin_ok" $llm_relay_access_ok {
+    # 允许“本机访问”或“携带正确源站令牌”的请求继续向后代理。
     default 0;
     "1:0" 1;
     "1:1" 1;
@@ -29,6 +32,7 @@ map "$llm_relay_is_local:$llm_relay_origin_ok" $llm_relay_access_ok {
 }
 
 upstream llm_relay_backend {
+    # 这里定义真正的大模型 relay / 源站服务地址。
     zone llm_relay_backend 64k;
     server 127.0.0.1:8080 max_fails=3 fail_timeout=15s;
     keepalive 128;
@@ -54,6 +58,7 @@ server {
     http2 on;
     server_name llm-relay.example.com;
 
+    # 建议为 relay 源站保留单独日志，便于观察来源和异常请求。
     access_log /var/log/openresty/llm-relay.example.com.access.log structured_json buffer=256k flush=1s;
     error_log  /var/log/openresty/llm-relay.example.com.error.log warn;
 
@@ -67,12 +72,14 @@ server {
     keepalive_requests 10000;
 
     location = /healthz {
+        # 健康检查默认只允许本机调用，避免对外暴露内部探针。
         if ($llm_relay_is_local = 0) { return 403; }
         default_type text/plain;
         return 200 "ok\n";
     }
 
     location / {
+        # 这里是源站保护的核心入口：没有本机来源或合法令牌就直接拒绝。
         if ($llm_relay_access_ok = 0) { return 403; }
 
         proxy_pass http://llm_relay_backend;
@@ -91,6 +98,7 @@ server {
         proxy_buffering off;
         proxy_cache off;
         proxy_request_buffering off;
+        # relay 流式输出场景一般都建议关闭缓冲。
         add_header X-Accel-Buffering no always;
     }
 }

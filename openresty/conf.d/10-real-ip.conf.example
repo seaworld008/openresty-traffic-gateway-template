@@ -8,6 +8,7 @@
 # - 只有在你确认上游 ELB / SLB / Ingress 会正确透传真实 IP 时才启用
 # - 如果当前环境只能看到统一的内网 ELB IP，则不要启用
 
+# 告诉 OpenResty 从哪个头里读取真实客户端 IP。
 real_ip_header X-Forwarded-For;
 real_ip_recursive on;
 

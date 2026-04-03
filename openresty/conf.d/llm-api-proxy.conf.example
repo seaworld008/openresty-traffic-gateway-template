@@ -10,6 +10,7 @@
 # - 日志文件名
 
 upstream llm_api_backend {
+    # 这里定义大模型服务的回源地址，复制模板后通常优先改这里。
     zone llm_api_backend 64k;
     server 127.0.0.1:9000 max_fails=3 fail_timeout=15s;
     keepalive 64;
@@ -35,17 +36,21 @@ server {
     http2 on;
     server_name llm-api.example.com;
 
+    # 流式输出或长推理请求建议单独拆日志，方便观察慢请求和上游超时。
     access_log /var/log/openresty/llm-api.example.com.access.log structured_json buffer=256k flush=1s;
     error_log  /var/log/openresty/llm-api.example.com.error.log warn;
 
+    # 复制模板后，优先替换域名对应的证书路径。
     ssl_certificate     /etc/letsencrypt/live/llm-api.example.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/llm-api.example.com/privkey.pem;
     include /etc/nginx/snippets/ssl-common.conf;
     include /etc/nginx/snippets/security-headers.conf;
 
+    # 模型接口经常包含大请求体和长响应时间，这里默认放宽了请求大小和超时。
     client_max_body_size 100m;
 
     location / {
+        # 这里默认关闭代理缓冲，更适合流式输出和长连接推理场景。
         proxy_pass http://llm_api_backend;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
@@ -61,6 +66,7 @@ server {
         proxy_read_timeout 600s;
         proxy_buffering off;
         proxy_request_buffering off;
+        # 避免上游流式响应被中间缓冲。
         add_header X-Accel-Buffering no always;
     }
 }
