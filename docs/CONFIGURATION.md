@@ -160,6 +160,13 @@ make check
 make test-waitroom
 ```
 
+如果你已经在站点配置目录，也可以先执行：
+
+```bash
+cd openresty/conf.d
+./confctl.sh test
+```
+
 ## 5. 如何新增一个普通 API 系统
 
 如果新系统不需要等待室，只需要第一层公共能力：
@@ -168,6 +175,8 @@ make test-waitroom
 2. 绑定新的 `gateway_policy`
 3. 在 [openresty/lua/gateway/policies.lua](/data/openresty-install/openresty/lua/gateway/policies.lua) 中增加策略
 4. `make check`
+
+如果要在站点目录就地校验，也可以执行 `./confctl.sh test`。
 
 ## 6. 什么时候启用哪一层
 

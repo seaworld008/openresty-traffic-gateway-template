@@ -52,6 +52,8 @@ make check
 make test-first-layer
 ```
 
+如果你在 `openresty/conf.d/` 目录下操作，也可以先执行 `./confctl.sh test` 再跑测试。
+
 ## 3. 新增热点活动系统
 
 1. 复制 [waitroom-enrollment-gateway.conf.example](/data/openresty-install/openresty/conf.d/waitroom-enrollment-gateway.conf.example)
@@ -69,6 +71,8 @@ make test-first-layer
 make check
 make test-waitroom
 ```
+
+如果你在 `openresty/conf.d/` 目录下操作，也可以先执行 `./confctl.sh test` 再跑测试。
 
 ## 4. 新增系统后必须同步的内容
 

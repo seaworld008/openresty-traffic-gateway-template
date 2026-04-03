@@ -105,23 +105,29 @@
 6. 按场景执行功能测试
 7. `make reload`
 
-### 3.1 用 `confctl.sh` 快速生成骨架
+### 3.1 复制模板后用 `confctl.sh` 做运维检查
 
-例如新建前端站点：
+新增站点时，直接复制最接近的模板：
+
+```bash
+cp openresty/conf.d/frontend-proxy.conf.example openresty/conf.d/www.example.com.conf
+```
+
+或：
+
+```bash
+cp openresty/conf.d/waitroom-enrollment-gateway.conf.example openresty/conf.d/enroll-campus-a.conf
+```
+
+改完后，用 `confctl.sh` 做检查和 reload：
 
 ```bash
 cd openresty/conf.d
-./confctl.sh new frontend-proxy.conf.example www.example.com
+./confctl.sh test
+./confctl.sh reload
 ```
 
-例如新建热点活动站点：
-
-```bash
-cd openresty/conf.d
-./confctl.sh new waitroom-enrollment-gateway.conf.example enroll.example.com enroll-campus-a.conf
-```
-
-生成后，至少检查这些字段：
+复制后，至少检查这些字段：
 
 - `server_name`
 - `ssl_certificate`

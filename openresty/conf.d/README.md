@@ -80,23 +80,26 @@ sed -i 's/enroll.example.com/enroll-campus-a.example.com/g' openresty/conf.d/wai
 - `gateway_policy` / `admission_policy`
 - 日志文件名
 
-## 4.1 一键按域名生成模板
+## 4.1 配置检查与 reload
 
-如果你希望直接生成一份可编辑配置，可以使用：
+当前目录下的 `confctl.sh` 是面向 Docker Compose 部署的 OpenResty 运维入口，用于：
+
+- 检查配置
+- reload 配置
+- 重启容器
+- 查看日志
+- 查看服务状态
+
+例如：
 
 ```bash
 cd openresty/conf.d
-./confctl.sh new frontend-proxy.conf.example www.example.com
+./confctl.sh test
+./confctl.sh reload
+./confctl.sh ps
 ```
 
-或：
-
-```bash
-cd openresty/conf.d
-./confctl.sh new waitroom-enrollment-gateway.conf.example enroll.example.com enroll-campus-a.conf
-```
-
-模板里统一使用场景化的 `*.example.com` 域名，所以对于同类型站点，替换一次域名就可以得到一份基本可用的配置骨架。
+如果你要新增站点配置，请直接复制最接近的 `*.conf.example` 为对应 `.conf`，再手工修改域名、证书路径、日志名和 `proxy_pass`。
 
 ### 本地测试时批量启用
 

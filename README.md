@@ -302,6 +302,13 @@ docker compose exec -T openresty openresty -t
 make check
 ```
 
+也可以在站点配置目录直接执行：
+
+```bash
+cd openresty/conf.d
+./confctl.sh test
+```
+
 然后按 [examples/curl-tests.md](/data/openresty-install/examples/curl-tests.md) 中的步骤做验证。
 
 ### 3. 生产证书申请

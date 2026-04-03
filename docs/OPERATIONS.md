@@ -88,10 +88,24 @@ make ps
 make check
 ```
 
+或：
+
+```bash
+cd openresty/conf.d
+./confctl.sh test
+```
+
 ### 重新加载配置
 
 ```bash
 make reload
+```
+
+或：
+
+```bash
+cd openresty/conf.d
+./confctl.sh reload
 ```
 
 ### 查看网关日志
