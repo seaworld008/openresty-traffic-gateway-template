@@ -42,5 +42,5 @@ fi
 
 OUTPUT_PATH="${SCRIPT_DIR}/${OUTPUT}"
 
-sed "s/REPLACE_WITH_DOMAIN/${DOMAIN}/g" "${TEMPLATE_PATH}" > "${OUTPUT_PATH}"
+sed -E "s/[a-z0-9-]+\\.example\\.com/${DOMAIN}/g" "${TEMPLATE_PATH}" > "${OUTPUT_PATH}"
 echo "已生成配置：${OUTPUT_PATH}"

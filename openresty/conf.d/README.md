@@ -36,6 +36,10 @@
   JWT / HMAC / 动态路由 / Header&Body 改写
 - `gray-release-proxy.conf.example`
   灰度发布与流量分流
+- `llm-api-proxy.conf.example`
+  通用大模型 API 反向代理
+- `llm-relay-token-guard.conf.example`
+  大模型中转 API 的源站令牌保护
 
 ### OpenResty 第二阶段等待室场景
 
@@ -58,14 +62,14 @@
 
 ```bash
 cp openresty/conf.d/frontend-proxy.conf.example openresty/conf.d/frontend-proxy.conf
-sed -i 's/REPLACE_WITH_DOMAIN/www.example.com/g' openresty/conf.d/frontend-proxy.conf
+sed -i 's/web.example.com/www.example.com/g' openresty/conf.d/frontend-proxy.conf
 ```
 
 例如启用热点活动等待室模板：
 
 ```bash
 cp openresty/conf.d/waitroom-enrollment-gateway.conf.example openresty/conf.d/waitroom-enrollment-gateway.conf
-sed -i 's/REPLACE_WITH_DOMAIN/enroll.example.com/g' openresty/conf.d/waitroom-enrollment-gateway.conf
+sed -i 's/enroll.example.com/enroll-campus-a.example.com/g' openresty/conf.d/waitroom-enrollment-gateway.conf
 ```
 
 复制后请按实际情况修改：
@@ -92,7 +96,7 @@ cd openresty/conf.d
 ./confctl.sh new waitroom-enrollment-gateway.conf.example enroll.example.com enroll-campus-a.conf
 ```
 
-模板里统一使用 `REPLACE_WITH_DOMAIN` 占位符，所以对于同类型站点，替换一次域名就可以得到一份基本可用的配置骨架。
+模板里统一使用场景化的 `*.example.com` 域名，所以对于同类型站点，替换一次域名就可以得到一份基本可用的配置骨架。
 
 ### 本地测试时批量启用
 
@@ -139,6 +143,8 @@ cd openresty/conf.d
 - `risk-protected-proxy.conf.example`
 - `partner-api-gateway.conf.example`
 - `gray-release-proxy.conf.example`
+- `llm-api-proxy.conf.example`
+- `llm-relay-token-guard.conf.example`
 
 ### 需要热点活动保护
 

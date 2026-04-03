@@ -1,0 +1,83 @@
+# 大模型中转 API 源站保护模板
+# 适用场景：
+# - 只允许本机或可信中转层访问的 LLM Relay
+# - 流式输出、长超时场景
+# - 需要一个简单的源站保护令牌
+#
+# 使用前建议修改：
+# - 域名
+# - upstream 地址
+# - X-Origin-Token 的密钥值
+# - 日志文件名
+
+upstream llm_relay_backend {
+    zone llm_relay_backend 64k;
+    server 127.0.0.1:8080 max_fails=3 fail_timeout=15s;
+    keepalive 128;
+}
+
+server {
+    listen 80;
+    server_name llm-relay.example.com;
+
+    location ^~ /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+        default_type text/plain;
+        try_files $uri =404;
+    }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name llm-relay.example.com;
+
+    access_log /var/log/openresty/llm-relay.example.com.access.log structured_json buffer=256k flush=1s;
+    error_log  /var/log/openresty/llm-relay.example.com.error.log warn;
+
+    ssl_certificate     /etc/letsencrypt/live/llm-relay.example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/llm-relay.example.com/privkey.pem;
+    include /etc/nginx/snippets/ssl-common.conf;
+    include /etc/nginx/snippets/security-headers.conf;
+
+    client_max_body_size 50m;
+    keepalive_timeout 65s;
+    keepalive_requests 10000;
+
+    set $llm_relay_access_ok 0;
+    if ($remote_addr = 127.0.0.1) { set $llm_relay_access_ok 1; }
+    if ($remote_addr = ::1) { set $llm_relay_access_ok 1; }
+    if ($http_x_origin_token = "REPLACE_WITH_LONG_RANDOM_TOKEN") { set $llm_relay_access_ok 1; }
+
+    location = /healthz {
+        if ($llm_relay_access_ok = 0) { return 403; }
+        default_type text/plain;
+        return 200 "ok\n";
+    }
+
+    location / {
+        if ($llm_relay_access_ok = 0) { return 403; }
+
+        proxy_pass http://llm_relay_backend;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header Authorization $http_authorization;
+        proxy_set_header Connection "";
+        proxy_connect_timeout 5s;
+        proxy_send_timeout 3600s;
+        proxy_read_timeout 3600s;
+        proxy_next_upstream off;
+        proxy_buffering off;
+        proxy_cache off;
+        proxy_request_buffering off;
+        add_header X-Accel-Buffering no always;
+    }
+}

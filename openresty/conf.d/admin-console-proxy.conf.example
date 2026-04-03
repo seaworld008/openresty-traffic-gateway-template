@@ -1,6 +1,6 @@
 server {
     listen 80;
-    server_name REPLACE_WITH_DOMAIN;
+    server_name console.example.com;
 
     location ^~ /.well-known/acme-challenge/ {
         root /var/www/certbot;
@@ -16,13 +16,13 @@ server {
 server {
     listen 443 ssl;
     http2 on;
-    server_name REPLACE_WITH_DOMAIN;
+    server_name console.example.com;
 
-    access_log /var/log/openresty/REPLACE_WITH_DOMAIN.access.log structured_json buffer=256k flush=1s;
-    error_log  /var/log/openresty/REPLACE_WITH_DOMAIN.error.log warn;
+    access_log /var/log/openresty/console.example.com.access.log structured_json buffer=256k flush=1s;
+    error_log  /var/log/openresty/console.example.com.error.log warn;
 
-    ssl_certificate     /etc/letsencrypt/live/REPLACE_WITH_DOMAIN/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/REPLACE_WITH_DOMAIN/privkey.pem;
+    ssl_certificate     /etc/letsencrypt/live/console.example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/console.example.com/privkey.pem;
     include /etc/nginx/snippets/ssl-common.conf;
     include /etc/nginx/snippets/security-headers.conf;
 

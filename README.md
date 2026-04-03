@@ -160,6 +160,8 @@ Internet -> OpenResty
 │   │   ├── risk-protected-proxy.conf.example
 │   │   ├── partner-api-gateway.conf.example
 │   │   ├── gray-release-proxy.conf.example
+│   │   ├── llm-api-proxy.conf.example
+│   │   ├── llm-relay-token-guard.conf.example
 │   │   └── waitroom-enrollment-gateway.conf.example
 │   ├── snippets/
 │   ├── logs/
@@ -398,6 +400,10 @@ docker compose up -d openresty
   对接型 API 案例，覆盖 JWT、HMAC、Redis 合作方配置、统一请求 ID、Header / Body 改写和动态路由。
 - [openresty/conf.d/gray-release-proxy.conf.example](/data/openresty-install/openresty/conf.d/gray-release-proxy.conf.example)
   灰度发布案例，覆盖 Header 灰度、按百分比灰度和 Redis 统一开关。
+- [openresty/conf.d/llm-api-proxy.conf.example](/data/openresty-install/openresty/conf.d/llm-api-proxy.conf.example)
+  大模型 API 网关模板，适合 OpenAI 兼容接口、内部推理服务与流式输出场景。
+- [openresty/conf.d/llm-relay-token-guard.conf.example](/data/openresty-install/openresty/conf.d/llm-relay-token-guard.conf.example)
+  大模型中转源站保护模板，适合只允许本机或可信中转层访问的 relay 场景。
 - [openresty/conf.d/waitroom-enrollment-gateway.conf.example](/data/openresty-install/openresty/conf.d/waitroom-enrollment-gateway.conf.example)
   第二阶段等待室案例，覆盖入口排队、准入通行证、关键步骤保护和通用可调阈值策略。
 

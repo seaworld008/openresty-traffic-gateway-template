@@ -20,28 +20,28 @@ for example_file in "${CONF_DIR}"/*.conf.example; do
   target_file="${example_file%.example}"
   case "$(basename "${example_file}")" in
     frontend-proxy.conf.example)
-      sed 's/REPLACE_WITH_DOMAIN/www.example.test/g' "${example_file}" > "${target_file}"
+      sed 's/web.example.com/www.example.test/g' "${example_file}" > "${target_file}"
       ;;
     api-proxy.conf.example)
-      sed 's/REPLACE_WITH_DOMAIN/api.example.test/g' "${example_file}" > "${target_file}"
+      sed 's/api.example.com/api.example.test/g' "${example_file}" > "${target_file}"
       ;;
     admin-console-proxy.conf.example)
-      sed 's/REPLACE_WITH_DOMAIN/admin.example.test/g' "${example_file}" > "${target_file}"
+      sed 's/console.example.com/admin.example.test/g' "${example_file}" > "${target_file}"
       ;;
     static-local-root.conf.example)
-      sed 's/REPLACE_WITH_DOMAIN/static.example.test/g' "${example_file}" > "${target_file}"
+      sed 's/web.example.com/static.example.test/g' "${example_file}" > "${target_file}"
       ;;
     risk-protected-proxy.conf.example)
-      sed 's/REPLACE_WITH_DOMAIN/risk-gateway.example.test/g' "${example_file}" > "${target_file}"
+      sed 's/risk.example.com/risk-gateway.example.test/g' "${example_file}" > "${target_file}"
       ;;
     partner-api-gateway.conf.example)
-      sed 's/REPLACE_WITH_DOMAIN/partner-api.example.test/g' "${example_file}" > "${target_file}"
+      sed 's/partner-api.example.com/partner-api.example.test/g' "${example_file}" > "${target_file}"
       ;;
     gray-release-proxy.conf.example)
-      sed 's/REPLACE_WITH_DOMAIN/gray-release.example.test/g' "${example_file}" > "${target_file}"
+      sed 's/gray-release.example.com/gray-release.example.test/g' "${example_file}" > "${target_file}"
       ;;
     waitroom-enrollment-gateway.conf.example)
-      sed 's/REPLACE_WITH_DOMAIN/enroll.example.test/g' "${example_file}" > "${target_file}"
+      sed 's/enroll.example.com/enroll.example.test/g' "${example_file}" > "${target_file}"
       ;;
   esac
 done

@@ -1,0 +1,66 @@
+# 大模型 API 反向代理模板
+# 适用场景：
+# - OpenAI 兼容接口
+# - 内部 LLM 推理网关
+# - 模型服务统一 HTTPS 入口
+#
+# 使用前建议修改：
+# - 域名
+# - upstream 地址
+# - 日志文件名
+
+upstream llm_api_backend {
+    zone llm_api_backend 64k;
+    server 127.0.0.1:9000 max_fails=3 fail_timeout=15s;
+    keepalive 64;
+}
+
+server {
+    listen 80;
+    server_name llm-api.example.com;
+
+    location ^~ /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+        default_type text/plain;
+        try_files $uri =404;
+    }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name llm-api.example.com;
+
+    access_log /var/log/openresty/llm-api.example.com.access.log structured_json buffer=256k flush=1s;
+    error_log  /var/log/openresty/llm-api.example.com.error.log warn;
+
+    ssl_certificate     /etc/letsencrypt/live/llm-api.example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/llm-api.example.com/privkey.pem;
+    include /etc/nginx/snippets/ssl-common.conf;
+    include /etc/nginx/snippets/security-headers.conf;
+
+    client_max_body_size 100m;
+
+    location / {
+        proxy_pass http://llm_api_backend;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-Port $server_port;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 600s;
+        proxy_read_timeout 600s;
+        proxy_buffering off;
+        proxy_request_buffering off;
+        add_header X-Accel-Buffering no always;
+    }
+}
