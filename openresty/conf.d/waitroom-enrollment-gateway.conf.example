@@ -1,3 +1,6 @@
+# 第二阶段等待室模板
+# 适合抢课、报名、秒杀、预约放号等热点活动入口。
+
 server {
     listen 80;
     server_name enroll.example.com;
@@ -18,9 +21,11 @@ server {
     http2 on;
     server_name enroll.example.com;
 
+    # 这个模板的核心不是普通限流，而是等待室策略 + 已准入关键路径保护。
     access_log /var/log/openresty/enroll.example.com.access.log structured_json buffer=256k flush=1s;
     error_log  /var/log/openresty/enroll.example.com.error.log warn;
 
+    # 复制模板时，优先替换 admission_policy 为你自己的活动策略。
     set $admission_policy course_enroll_demo;
 
     ssl_certificate     /etc/letsencrypt/live/enroll.example.com/fullchain.pem;
@@ -31,24 +36,29 @@ server {
     root /usr/local/openresty/nginx/html;
 
     location = /waitroom.html {
+        # 等待页静态入口，前端通常会轮询 status 接口查看排队进度。
         try_files /waitroom/index.html =404;
     }
 
     location = /api/enroll/submit {
+        # 新用户进入等待室的入口；默认按用户标识做 join 限流。
         limit_req zone=per_waitroom_identity_join burst=10 nodelay;
         content_by_lua_file /etc/nginx/lua/admission/content_join.lua;
     }
 
     location = /api/queue/status {
+        # 前端轮询排队状态；默认轮询频率限制比 join 更严格。
         limit_req zone=per_waitroom_identity_poll burst=5 nodelay;
         content_by_lua_file /etc/nginx/lua/admission/content_status.lua;
     }
 
     location = /api/ops/waitroom/summary {
+        # 只读运维摘要接口，用于查看活跃准入数、排队人数和容量参数。
         content_by_lua_file /etc/nginx/lua/admission/content_summary.lua;
     }
 
     location = /api/cart/add {
+        # 下面这些关键路径只允许已准入用户继续访问。
         access_by_lua_file /etc/nginx/lua/admission/access_protected.lua;
         include /etc/nginx/snippets/proxy-common.conf;
         proxy_pass http://echo_backend/anything/cart/add;
@@ -73,6 +83,7 @@ server {
     }
 
     location / {
+        # 默认根路径只返回占位文本，实际项目通常会替换成活动首页或跳转逻辑。
         return 200 "enroll gateway ready\n";
     }
 }

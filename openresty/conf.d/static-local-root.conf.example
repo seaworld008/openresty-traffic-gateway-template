@@ -1,3 +1,6 @@
+# 本地静态站点模板
+# 适合直接由 OpenResty 托管静态页面、构建产物或演示站点。
+
 server {
     listen 80;
     server_name web.example.com;
@@ -18,6 +21,7 @@ server {
     http2 on;
     server_name web.example.com;
 
+    # 静态站点也建议保留独立日志，便于区分静态资源和动态回源流量。
     access_log /var/log/openresty/web.example.com.access.log structured_json buffer=256k flush=1s;
     error_log  /var/log/openresty/web.example.com.error.log warn;
 
@@ -30,11 +34,13 @@ server {
     index index.html;
 
     location /assets/ {
+        # 这里给静态资源挂统一缓存策略，适合 CSS/JS/图片等强缓存文件。
         include /etc/nginx/snippets/cache-common.conf;
         try_files $uri =404;
     }
 
     location / {
+        # 单页应用可保留 fallback 到 /index.html 的行为。
         try_files $uri $uri/ /index.html;
     }
 }

@@ -1,3 +1,6 @@
+# 普通前端站点模板
+# 适合官网、活动页、BFF 前端入口等常规反向代理场景。
+
 server {
     listen 80;
     server_name web.example.com;
@@ -18,15 +21,18 @@ server {
     http2 on;
     server_name web.example.com;
 
+    # 建议按站点独立拆 access/error 日志，方便排障和回滚。
     access_log /var/log/openresty/web.example.com.access.log structured_json buffer=256k flush=1s;
     error_log  /var/log/openresty/web.example.com.error.log warn;
 
+    # 复制模板后，这里通常只需要替换域名对应的证书路径。
     ssl_certificate     /etc/letsencrypt/live/web.example.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/web.example.com/privkey.pem;
     include /etc/nginx/snippets/ssl-common.conf;
     include /etc/nginx/snippets/security-headers.conf;
 
     location / {
+        # 前端站点默认直接回源到 frontend_backend。
         include /etc/nginx/snippets/proxy-common.conf;
         proxy_pass http://frontend_backend;
     }

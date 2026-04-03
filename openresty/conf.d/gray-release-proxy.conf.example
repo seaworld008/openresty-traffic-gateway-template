@@ -1,3 +1,6 @@
+# 灰度发布模板
+# 适合按 Header / Cookie / 百分比做流量分流的发布场景。
+
 server {
     listen 80;
     server_name gray-release.example.com;
@@ -18,9 +21,11 @@ server {
     http2 on;
     server_name gray-release.example.com;
 
+    # 这个模板通过 gateway_policy 绑定灰度策略，站点文件只做流量接入。
     access_log /var/log/openresty/gray-release.example.com.access.log structured_json buffer=256k flush=1s;
     error_log  /var/log/openresty/gray-release.example.com.error.log warn;
 
+    # 默认 upstream 只是兜底值，最终是否走 canary/stable 由 Lua 策略判定。
     set $gateway_policy gray_release;
     set $gateway_upstream frontend_backend;
     set $gateway_upstream_uri $request_uri;
@@ -37,6 +42,7 @@ server {
     include /etc/nginx/snippets/gateway-phase-common.conf;
 
     location / {
+        # 如果后续要扩多路灰度，优先改策略文件，不要把判断逻辑直接堆到 server 块。
         include /etc/nginx/snippets/proxy-common.conf;
         proxy_next_upstream_tries 2;
         proxy_pass http://$gateway_upstream$gateway_upstream_uri;

@@ -1,3 +1,6 @@
+# 第一层风控 / 限流 / 简单熔断模板
+# 适合给现有业务入口快速叠加基础保护能力。
+
 server {
     listen 80;
     server_name risk.example.com;
@@ -18,9 +21,11 @@ server {
     http2 on;
     server_name risk.example.com;
 
+    # 这个模板的关键是绑定第一层策略，而不是在 server 里堆业务逻辑。
     access_log /var/log/openresty/risk.example.com.access.log structured_json buffer=256k flush=1s;
     error_log  /var/log/openresty/risk.example.com.error.log warn;
 
+    # 复制模板时，优先改 policy 名称和默认 upstream。
     set $gateway_policy risk_gateway;
     set $gateway_upstream frontend_backend;
     set $gateway_upstream_uri $request_uri;
@@ -37,6 +42,7 @@ server {
     include /etc/nginx/snippets/gateway-phase-common.conf;
 
     location / {
+        # 这里是站点层最轻的一层保护；更细的风控、熔断、灰度在 Lua 策略里配。
         limit_req zone=per_ip_risk burst=8 nodelay;
         include /etc/nginx/snippets/proxy-common.conf;
         proxy_next_upstream_tries 2;

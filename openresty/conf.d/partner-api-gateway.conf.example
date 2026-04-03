@@ -1,3 +1,6 @@
+# 合作方 API 网关模板
+# 适合需要 JWT / HMAC / Redis 元数据 / 动态路由的对接型 API。
+
 server {
     listen 80;
     server_name partner-api.example.com;
@@ -18,9 +21,11 @@ server {
     http2 on;
     server_name partner-api.example.com;
 
+    # 这个模板的行为主要由 gateway_policy 对应的 Lua 策略决定。
     access_log /var/log/openresty/partner-api.example.com.access.log structured_json buffer=256k flush=1s;
     error_log  /var/log/openresty/partner-api.example.com.error.log warn;
 
+    # 复制模板时，优先改 policy、默认 upstream 和日志名。
     set $gateway_policy partner_api;
     set $gateway_upstream api_backend;
     set $gateway_upstream_uri $request_uri;
@@ -39,6 +44,7 @@ server {
     include /etc/nginx/snippets/gateway-phase-common.conf;
 
     location / {
+        # 第一层策略会在 access/header/body/log 各阶段接管鉴权、改写和路由决策。
         include /etc/nginx/snippets/proxy-common.conf;
         proxy_next_upstream_tries 2;
         proxy_pass http://$gateway_upstream$gateway_upstream_uri;

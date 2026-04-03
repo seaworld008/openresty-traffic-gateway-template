@@ -1,3 +1,6 @@
+# 管理后台 / 控制台模板
+# 适合运维后台、业务控制台、内部门户等需要更保守限流的场景。
+
 server {
     listen 80;
     server_name console.example.com;
@@ -18,6 +21,7 @@ server {
     http2 on;
     server_name console.example.com;
 
+    # 后台访问量通常较小，建议保持独立日志方便审计。
     access_log /var/log/openresty/console.example.com.access.log structured_json buffer=256k flush=1s;
     error_log  /var/log/openresty/console.example.com.error.log warn;
 
@@ -27,6 +31,7 @@ server {
     include /etc/nginx/snippets/security-headers.conf;
 
     location / {
+        # 控制台默认限流更保守，避免后台接口被暴力打穿。
         limit_req zone=per_ip_admin burst=10 nodelay;
         include /etc/nginx/snippets/proxy-common.conf;
         proxy_pass http://admin_backend;
