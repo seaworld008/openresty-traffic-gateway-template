@@ -65,7 +65,7 @@
 
 ### 路由与站点
 
-示例站点位于 [openresty/conf.d/sites/case-enroll-waitroom.conf](/data/openresty-install/openresty/conf.d/sites/case-enroll-waitroom.conf)。
+示例站点位于 [openresty/conf.d/waitroom-enrollment-gateway.conf.example](/data/openresty-install/openresty/conf.d/waitroom-enrollment-gateway.conf.example)。
 
 路径拆分：
 
@@ -271,11 +271,9 @@ curl -k \
 
 如果以后你们需要更完整的监控，再把这条接口结果接到 Prometheus / Loki / Grafana 即可。
 
-对应的只读运维页：
+如果你们后续要把等待室接到其他业务域名，建议优先参考：
 
-- `GET /ops/waitroom.html`
-
-这个页面只是调用摘要接口，不引入额外服务，适合临时观察。
+- [docs/SCENARIO_GUIDE.md](/data/openresty-install/docs/SCENARIO_GUIDE.md)
 
 ## 接入到其他业务时的建议
 

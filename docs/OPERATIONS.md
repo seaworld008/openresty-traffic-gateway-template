@@ -17,6 +17,10 @@
 - 排障
 - 等待室查看
 
+如果你当前的任务是“新增一个站点”或“老站接入高级能力”，请先看：
+
+- [docs/SCENARIO_GUIDE.md](/data/openresty-install/docs/SCENARIO_GUIDE.md)
+
 ## 2. 日常命令
 
 ### 默认时区
@@ -135,20 +139,14 @@ make waitroom-summary
 
 默认使用 `.env` 中的 `GATEWAY_OPS_TOKEN`。
 
-### 浏览器查看
+### 直接调用摘要接口
 
-打开：
-
-```text
-https://enroll.example.test/ops/waitroom.html
+```bash
+curl -k \
+  -H "X-Ops-Token: ${GATEWAY_OPS_TOKEN:-change-this-before-production}" \
+  --resolve enroll.example.test:443:127.0.0.1 \
+  https://enroll.example.test/api/ops/waitroom/summary
 ```
-
-输入正确的 `X-Ops-Token` 后可查看：
-
-- 当前稳态容量
-- 当前突发容量
-- 当前活跃准入数
-- 当前排队人数
 
 ## 5. 高峰活动前检查清单
 
@@ -309,4 +307,5 @@ make test-comprehensive
 
 - [docs/ARCHITECTURE.md](/data/openresty-install/docs/ARCHITECTURE.md)
 - [docs/CONFIGURATION.md](/data/openresty-install/docs/CONFIGURATION.md)
+- [docs/SCENARIO_GUIDE.md](/data/openresty-install/docs/SCENARIO_GUIDE.md)
 - [examples/waitroom-best-practice.md](/data/openresty-install/examples/waitroom-best-practice.md)

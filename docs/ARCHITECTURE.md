@@ -88,7 +88,7 @@
 - [openresty/lua/admission](/data/openresty-install/openresty/lua/admission)
 - [openresty/conf.d/waitroom-enrollment-gateway.conf.example](/data/openresty-install/openresty/conf.d/waitroom-enrollment-gateway.conf.example)
 - [openresty/html/waitroom/index.html](/data/openresty-install/openresty/html/waitroom/index.html)
-- [openresty/html/waitroom/ops.html](/data/openresty-install/openresty/html/waitroom/ops.html)
+- [docs/SCENARIO_GUIDE.md](/data/openresty-install/docs/SCENARIO_GUIDE.md)
 
 ## 4. 为什么要区分第一层和第二阶段
 
@@ -244,4 +244,5 @@ OpenResty 经常看不到真实客户端 IP，只能看到统一的上游出口 
 - [README.md](/data/openresty-install/README.md)
 - [docs/OPERATIONS.md](/data/openresty-install/docs/OPERATIONS.md)
 - [docs/CONFIGURATION.md](/data/openresty-install/docs/CONFIGURATION.md)
+- [docs/SCENARIO_GUIDE.md](/data/openresty-install/docs/SCENARIO_GUIDE.md)
 - [examples/waitroom-best-practice.md](/data/openresty-install/examples/waitroom-best-practice.md)

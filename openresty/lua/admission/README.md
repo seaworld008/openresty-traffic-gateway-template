@@ -12,8 +12,6 @@
 
 - `policies.lua`
   第二阶段策略配置
-- `policies.production.example.lua`
-  生产策略模板示例
 - `service.lua`
   第二阶段主入口，负责 join/status/protected/summary
 - `store.lua`
@@ -62,4 +60,7 @@
 ## 运维入口
 
 - 只读摘要接口：`/api/ops/waitroom/summary`
-- 只读运维页：`/ops/waitroom.html`
+
+如果你要把等待室接到一个新系统或老系统上，实施步骤见：
+
+- [docs/SCENARIO_GUIDE.md](/data/openresty-install/docs/SCENARIO_GUIDE.md)

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import json
 import ssl
 import time
@@ -41,11 +42,17 @@ def post_join(user_id: str) -> dict:
 
 
 def main():
-    total = 30
+    parser = argparse.ArgumentParser(description="等待室入口并发模拟")
+    parser.add_argument("--total", type=int, default=30)
+    parser.add_argument("--concurrency", type=int, default=30)
+    args = parser.parse_args()
+
+    total = args.total
+    concurrency = args.concurrency
     started = time.perf_counter()
     results = []
 
-    with ThreadPoolExecutor(max_workers=30) as executor:
+    with ThreadPoolExecutor(max_workers=concurrency) as executor:
         futures = [executor.submit(post_join, f"bench-user-{index:03d}") for index in range(total)]
         for future in as_completed(futures):
             results.append(future.result())

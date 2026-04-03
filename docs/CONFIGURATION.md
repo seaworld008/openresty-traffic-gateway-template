@@ -9,6 +9,16 @@
 - 调整等待室容量
 - 选择是否启用第一层和第二阶段能力
 
+如果你要找“按场景操作”的详细步骤，例如：
+
+- 新站怎么接
+- 老站怎么增量加限流 / 风控 / 熔断
+- 热点活动怎么接等待室
+
+请直接看：
+
+- [docs/SCENARIO_GUIDE.md](/data/openresty-install/docs/SCENARIO_GUIDE.md)
+
 ## 2. 配置分层
 
 ### 2.1 主配置
@@ -64,6 +74,12 @@
 - [examples/backend/docker-compose.local.yml](/data/openresty-install/examples/backend/docker-compose.local.yml)
 
 这个文件只用于本地联调与功能验证，不属于生产主栈。
+
+### 2.8 场景化接入指引
+
+- [docs/SCENARIO_GUIDE.md](/data/openresty-install/docs/SCENARIO_GUIDE.md)
+
+当你要做“新增站点”或“老站改造”时，优先先看这份文档，再回来改具体配置。
 
 ## 3. 如何修改容量参数
 
@@ -212,9 +228,8 @@ make test-waitroom
 - `token.ttl_seconds = 900`
 - `queue.poll_interval_seconds = 3`
 
-具体模板见：
-
-- [openresty/lua/admission/policies.production.example.lua](/data/openresty-install/openresty/lua/admission/policies.production.example.lua)
+这些值不是固定模板，只是容量起点。
+最终仍应以压测和真实业务链路时长为准。
 
 ## 8. 如何启用真实 IP
 
@@ -256,4 +271,5 @@ make reload
 
 - [docs/ARCHITECTURE.md](/data/openresty-install/docs/ARCHITECTURE.md)
 - [docs/OPERATIONS.md](/data/openresty-install/docs/OPERATIONS.md)
+- [docs/SCENARIO_GUIDE.md](/data/openresty-install/docs/SCENARIO_GUIDE.md)
 - [README.md](/data/openresty-install/README.md)

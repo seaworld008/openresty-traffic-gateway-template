@@ -420,8 +420,8 @@ docker compose up -d openresty
 - `queue.poll_interval_seconds`
 - `protected.paths`
 
-如果某个系统压测结论是“最大安全合理并发 10000”，就可以把该策略设为 `steady=10000, burst=12000`。  
-如果另一个系统只有 `2000`，就可以设为 `steady=2000, burst=2400`。  
+如果某个系统压测结论是“最大安全合理并发 10000”，就可以把该策略设为 `steady=10000, burst=12000`。
+如果另一个系统只有 `2000`，就可以设为 `steady=2000, burst=2400`。
 这套逻辑本身不需要改。
 
 ### 第二阶段默认不依赖真实 IP
@@ -432,7 +432,7 @@ docker compose up -d openresty
 - 业务用户 Cookie
 - `user_id` 参数
 
-只有拿不到这些标识时，才回退到来源 IP。  
+只有拿不到这些标识时，才回退到来源 IP。
 这样在政务云、统一内网 ELB、统一代理出口等环境里，仍然可以稳定工作。
 
 如果你的环境能可靠透传真实客户端 IP，可以按需启用：
@@ -448,6 +448,11 @@ docker compose up -d openresty
 5. 执行 `docker compose exec -T openresty openresty -t`
 6. 用 `./ssl/scripts/init-cert.sh` 申请证书
 7. 用 `./ssl/scripts/reload-openresty.sh` 触发重载
+
+如果你要处理的是“老站如何渐进式加限流、风控、熔断”或“热点活动如何接入等待室”，请直接参考：
+
+- [docs/SCENARIO_GUIDE.md](/data/openresty-install/docs/SCENARIO_GUIDE.md)
+  按场景给出可操作步骤、最小改动点、检查命令和回滚建议
 
 ## 日常运维命令
 
@@ -558,14 +563,6 @@ make waitroom-summary
 
 生产环境请务必修改 `.env` 中的 `GATEWAY_OPS_TOKEN`。
 
-### 打开等待室只读运维页
-
-```text
-https://enroll.example.test/ops/waitroom.html
-```
-
-页面会直接请求当前域名下的等待室摘要接口，不依赖额外系统。
-
 ### 一键综合验证
 
 ```bash
@@ -585,6 +582,8 @@ make test-comprehensive
 
 另外还有两份补充文档：
 
+- [docs/SCENARIO_GUIDE.md](/data/openresty-install/docs/SCENARIO_GUIDE.md)
+  按场景说明如何新增站点、改造老站、接入第一层能力或等待室
 - [docs/ADD_NEW_SYSTEM.md](/data/openresty-install/docs/ADD_NEW_SYSTEM.md)
   新增一个系统时的快速操作说明
 - [docs/DOC_SYNC_POLICY.md](/data/openresty-install/docs/DOC_SYNC_POLICY.md)
@@ -649,41 +648,18 @@ make down-local
 
 以后只要模板有改动，都建议同步更新本地验证命令和结果。验证入口见 [examples/curl-tests.md](/data/openresty-install/examples/curl-tests.md)，设计背景见 `docs/plans/` 下的说明文档。
 
-本仓库已在本机于 `2026-04-01` 完成以下实际验证：
+本仓库已在本机于 `2026-04-03` 重新完成以下实际验证：
 
-- `bash -n ssl/scripts/*.sh`
-- `docker compose config`
-- `./ssl/scripts/init-local-certs.sh`
-- `docker compose pull openresty frontend api-service admin-service`
-- `docker compose --profile ops pull certbot`
-- `docker compose up -d`
-- `docker compose exec -T openresty openresty -t`
-- `curl -i http://127.0.0.1/healthz`
-- `curl -I --resolve api.example.test:80:127.0.0.1 http://api.example.test/`
-- `curl -k --resolve api.example.test:443:127.0.0.1 https://api.example.test/`
-- `curl -k --resolve admin.example.test:443:127.0.0.1 https://admin.example.test/`
-- `curl -k -I --resolve static.example.test:443:127.0.0.1 https://static.example.test/assets/site.css`
-- 外部 Redis 容器：`redis:7.2.5-alpine`
-- `curl -k -i -H 'User-Agent: evil-bot/1.0' --resolve risk-gateway.example.test:443:127.0.0.1 https://risk-gateway.example.test/`
-- `curl -k -i -H 'X-Forwarded-For: 198.51.100.24' --resolve risk-gateway.example.test:443:127.0.0.1 https://risk-gateway.example.test/denylist`
-- `curl -k -i -H 'X-Forwarded-For: 203.0.113.10' --resolve risk-gateway.example.test:443:127.0.0.1 https://risk-gateway.example.test/allowlist`
-- 并发限流测试：`seq 1 25 | xargs -P25 ...`
-- 熔断测试：连续访问 `https://risk-gateway.example.test/unstable`
-- JWT + Redis + Body 改写：`https://partner-api.example.test/v1/orders`
-- HMAC / 时间戳签名：`https://partner-api.example.test/v1/hooks/inventory`
-- 动态路由：`https://partner-api.example.test/v1/dispatch`
-- 灰度开关：`https://gray-release.example.test/`
+- `make check`
+- `make test-comprehensive`
 
 验证结果摘要：
 
 - OpenResty 配置语法通过
-- `http://127.0.0.1/healthz` 返回 `200 OK`
-- `api.example.test` 的 HTTP 请求会跳转到 HTTPS
-- `www`、`api`、`admin` 三个域名都能正确代理到示例后端
-- `static.example.test/assets/site.css` 返回单一 `Cache-Control: public, max-age=3600, immutable`
 - `risk-gateway.example.test` 已验证 UA 风控、IP 黑白名单、限流和简单熔断
 - `partner-api.example.test` 已验证 JWT、HMAC、Redis 合作方配置、Header / Body 改写和动态路由
 - `gray-release.example.test` 已验证灰度命中与 Redis 统一关闭灰度
 - `enroll.example.test` 已验证等待室入口、准入通行证、关键路径保护和排队补位
+- 综合验证中的第一层并发压测、等待室并发模拟与等待室摘要查询全部通过
 
 高级能力测试命令与说明见 [examples/advanced-tests.md](/data/openresty-install/examples/advanced-tests.md)。
