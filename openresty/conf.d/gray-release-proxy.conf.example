@@ -1,6 +1,20 @@
 # 灰度发布模板
 # 适合按 Header / Cookie / 百分比做流量分流的发布场景。
 
+upstream gray_release_stable_backend {
+    # 灰度模板的稳定版本回源。
+    zone gray_release_stable_backend 64k;
+    server frontend:80 resolve max_fails=3 fail_timeout=15s;
+    keepalive 32;
+}
+
+upstream gray_release_canary_backend {
+    # 灰度模板的 canary 回源，这里用 echo/httpbin 方便观察命中结果。
+    zone gray_release_canary_backend 64k;
+    server echo-service:8080 resolve max_fails=3 fail_timeout=15s;
+    keepalive 64;
+}
+
 server {
     listen 80;
     server_name gray-release.example.com;
@@ -27,7 +41,7 @@ server {
 
     # 默认 upstream 只是兜底值，最终是否走 canary/stable 由 Lua 策略判定。
     set $gateway_policy gray_release;
-    set $gateway_upstream frontend_backend;
+    set $gateway_upstream gray_release_stable_backend;
     set $gateway_upstream_uri $request_uri;
     set $gateway_route gray_release;
     set $gateway_request_id "";

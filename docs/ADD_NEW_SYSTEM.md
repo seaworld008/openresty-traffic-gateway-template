@@ -36,6 +36,7 @@
 参考：
 
 - [openresty/conf.d/waitroom-enrollment-gateway.conf.example](/data/openresty-install/openresty/conf.d/waitroom-enrollment-gateway.conf.example)
+- [openresty/conf.d/waitroom-java-gateway.conf.example](/data/openresty-install/openresty/conf.d/waitroom-java-gateway.conf.example)
 - [openresty/lua/admission/policies.lua](/data/openresty-install/openresty/lua/admission/policies.lua)
 
 ## 2. 新增普通系统
@@ -57,9 +58,11 @@ make test-first-layer
 ## 3. 新增热点活动系统
 
 1. 复制 [waitroom-enrollment-gateway.conf.example](/data/openresty-install/openresty/conf.d/waitroom-enrollment-gateway.conf.example)
+   如果你们是 OpenResty -> Java gateway 架构，也可以直接复制 [waitroom-java-gateway.conf.example](/data/openresty-install/openresty/conf.d/waitroom-java-gateway.conf.example)
 2. 修改 `server_name`
 3. 修改 `admission_policy`
 4. 修改热点入口、排队接口、关键受保护路径
+   同时修改当前子配置文件里的业务 `upstream`
 5. 在 [openresty/lua/admission/policies.lua](/data/openresty-install/openresty/lua/admission/policies.lua) 中增加新策略
 6. 根据压测结果设置：
    - `capacity.steady`

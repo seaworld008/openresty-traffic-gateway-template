@@ -86,12 +86,14 @@
 推荐模板：
 
 - [openresty/conf.d/waitroom-enrollment-gateway.conf.example](/data/openresty-install/openresty/conf.d/waitroom-enrollment-gateway.conf.example)
+- [openresty/conf.d/waitroom-java-gateway.conf.example](/data/openresty-install/openresty/conf.d/waitroom-java-gateway.conf.example)
 
 特点：
 
 - 不只是普通限流
 - 需要入口排队、状态轮询和关键路径保护
 - 策略核心是 `capacity.steady` 与 `capacity.burst`
+- 如果业务统一先打到 Java gateway，可直接使用 Java gateway 版本模板
 
 ## 3. 新站接入的标准流程
 
@@ -99,7 +101,7 @@
 
 1. 选一个最接近的模板
 2. 复制成新的 `.conf`
-3. 修改域名、证书路径、日志名和 upstream
+3. 修改域名、证书路径、日志名和当前子配置文件内的 upstream
 4. 如果启用了第一层或等待室，再绑定策略
 5. `make check`
 6. 按场景执行功能测试
@@ -119,6 +121,12 @@ cp openresty/conf.d/frontend-proxy.conf.example openresty/conf.d/www.example.com
 cp openresty/conf.d/waitroom-enrollment-gateway.conf.example openresty/conf.d/enroll-campus-a.conf
 ```
 
+如果你们是 OpenResty -> Java gateway 架构，也可以直接复制：
+
+```bash
+cp openresty/conf.d/waitroom-java-gateway.conf.example openresty/conf.d/enroll-java-gateway.conf
+```
+
 改完后，用 `confctl.sh` 做检查和 reload：
 
 ```bash
@@ -135,6 +143,7 @@ cd openresty/conf.d
 - `access_log`
 - `error_log`
 - `proxy_pass`
+- 子配置文件中的 `upstream`
 - `set $gateway_policy ...`
 - `set $admission_policy ...`
 
@@ -226,6 +235,7 @@ curl -k --resolve api.example.com:443:127.0.0.1 https://api.example.com/healthz
 推荐起点：
 
 - [openresty/conf.d/waitroom-enrollment-gateway.conf.example](/data/openresty-install/openresty/conf.d/waitroom-enrollment-gateway.conf.example)
+- [openresty/conf.d/waitroom-java-gateway.conf.example](/data/openresty-install/openresty/conf.d/waitroom-java-gateway.conf.example)
 
 你需要同时改两处：
 
@@ -244,6 +254,19 @@ curl -k --resolve api.example.com:443:127.0.0.1 https://api.example.com/healthz
 - `capacity.burst`
 - `token.ttl_seconds`
 - `protected.paths`
+- 子配置文件内的业务 `upstream`
+
+如果你们的真实架构是：
+
+```text
+OpenResty -> Java gateway -> Nacos / 多个后端服务
+```
+
+建议直接使用 `waitroom-java-gateway.conf.example`：
+
+- OpenResty 只负责等待室和关键路径保护
+- Java gateway 继续负责服务发现和向后路由
+- OpenResty 不需要理解后面的 Nacos 拓扑
 
 最小检查：
 

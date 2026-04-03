@@ -7,7 +7,7 @@
 - `00-global.conf`
   全局 map、默认 server、限流区、ACME challenge 等基础配置
 - `01-upstreams.conf`
-  upstream 定义
+  upstream 预留占位文件
 - `10-real-ip.conf.example`
   可选真实 IP 配置模板，仅在上游能可靠透传真实 IP 时启用
 
@@ -51,6 +51,8 @@
 
 - `waitroom-enrollment-gateway.conf.example`
   抢课 / 报名 / 热点活动等待室
+- `waitroom-java-gateway.conf.example`
+  等待室接入 Java gateway，由 Java gateway 再向后转发业务请求
 
 ## 3. 为什么要用 `.conf.example`
 
@@ -83,6 +85,7 @@ sed -i 's/enroll.example.com/enroll-campus-a.example.com/g' openresty/conf.d/wai
 - `server_name`
 - 证书路径（默认已跟随同一个域名占位符）
 - `proxy_pass`
+- 子配置文件内的 `upstream`
 - `gateway_policy` / `admission_policy`
 - 日志文件名
 
@@ -105,7 +108,12 @@ cd openresty/conf.d
 ./confctl.sh ps
 ```
 
-如果你要新增站点配置，请直接复制最接近的 `*.conf.example` 为对应 `.conf`，再手工修改域名、证书路径、日志名和 `proxy_pass`。
+如果你要新增站点配置，请直接复制最接近的 `*.conf.example` 为对应 `.conf`，再手工修改域名、证书路径、日志名、当前子配置文件内的 `upstream` 和 `proxy_pass`。
+
+补充说明：
+
+- 当前仓库约定：只要模板用到了 upstream，就直接写在当前子配置文件里
+- `01-upstreams.conf` 只保留为预留占位文件，不再承载业务 upstream
 
 ### 本地测试时批量启用
 
@@ -158,6 +166,7 @@ cd openresty/conf.d
 ### 需要热点活动保护
 
 - `waitroom-enrollment-gateway.conf.example`
+- `waitroom-java-gateway.conf.example`
 
 ## 7. 启用后如何检查
 

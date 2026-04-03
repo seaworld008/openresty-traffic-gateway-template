@@ -1,6 +1,21 @@
 # 合作方 API 网关模板
 # 适合需要 JWT / HMAC / Redis 元数据 / 动态路由的对接型 API。
 
+upstream partner_api_backend {
+    # 合作方 API 默认回源。
+    zone partner_api_backend 64k;
+    server api-service:80 resolve max_fails=3 fail_timeout=15s;
+    least_conn;
+    keepalive 64;
+}
+
+upstream partner_api_echo_backend {
+    # 用于联调鉴权、改写和动态路由的 echo/httpbin 回源。
+    zone partner_api_echo_backend 64k;
+    server echo-service:8080 resolve max_fails=3 fail_timeout=15s;
+    keepalive 64;
+}
+
 server {
     listen 80;
     server_name partner-api.example.com;
@@ -27,7 +42,7 @@ server {
 
     # 复制模板时，优先改 policy、默认 upstream 和日志名。
     set $gateway_policy partner_api;
-    set $gateway_upstream api_backend;
+    set $gateway_upstream partner_api_backend;
     set $gateway_upstream_uri $request_uri;
     set $gateway_route partner_default;
     set $gateway_request_id "";

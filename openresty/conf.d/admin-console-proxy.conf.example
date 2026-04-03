@@ -1,6 +1,13 @@
 # 管理后台 / 控制台模板
 # 适合运维后台、业务控制台、内部门户等需要更保守限流的场景。
 
+upstream admin_console_backend {
+    # 当前模板自带 upstream，便于站点级单独维护。
+    zone admin_console_backend 64k;
+    server admin-service:80 resolve max_fails=3 fail_timeout=15s;
+    keepalive 16;
+}
+
 server {
     listen 80;
     server_name console.example.com;
@@ -34,6 +41,6 @@ server {
         # 控制台默认限流更保守，避免后台接口被暴力打穿。
         limit_req zone=per_ip_admin burst=10 nodelay;
         include /etc/nginx/snippets/proxy-common.conf;
-        proxy_pass http://admin_backend;
+        proxy_pass http://admin_console_backend;
     }
 }

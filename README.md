@@ -168,7 +168,8 @@ Internet -> OpenResty
 │   │   ├── gray-release-proxy.conf.example
 │   │   ├── llm-api-proxy.conf.example
 │   │   ├── llm-relay-token-guard.conf.example
-│   │   └── waitroom-enrollment-gateway.conf.example
+│   │   ├── waitroom-enrollment-gateway.conf.example
+│   │   └── waitroom-java-gateway.conf.example
 │   ├── snippets/
 │   ├── logs/
 │   ├── cache/
@@ -383,7 +384,8 @@ docker compose up -d openresty
 
 ### Upstreams
 
-`openresty/conf.d/01-upstreams.conf` 把后端拓扑从站点路由中分离出来，后续扩容应用实例时，通常只需要改 upstream 定义。
+`openresty/conf.d/01-upstreams.conf` 当前只保留为预留占位文件。
+仓库里的业务约定是：只要某个站点模板用到了 upstream，就直接写在该子配置文件中，减少跨文件维护成本。
 
 ### 站点文件
 
@@ -437,6 +439,8 @@ docker compose up -d openresty
   大模型中转源站保护模板，适合只允许本机或可信中转层访问的 relay 场景。
 - [openresty/conf.d/waitroom-enrollment-gateway.conf.example](/data/openresty-install/openresty/conf.d/waitroom-enrollment-gateway.conf.example)
   第二阶段等待室案例，覆盖入口排队、准入通行证、关键步骤保护和通用可调阈值策略。
+- [openresty/conf.d/waitroom-java-gateway.conf.example](/data/openresty-install/openresty/conf.d/waitroom-java-gateway.conf.example)
+  第二阶段等待室 + Java gateway 案例，适合 OpenResty 只负责等待室治理，业务请求统一转发到 Java gateway 的架构。
 
 ### 第二阶段策略怎么调
 

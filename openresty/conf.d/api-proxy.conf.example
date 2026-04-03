@@ -1,6 +1,14 @@
 # 普通 API 代理模板
 # 适合不需要第一层 Lua 高级能力、只需要基础限流和回源的 API 场景。
 
+upstream api_proxy_backend {
+    # 当前模板自带 upstream，避免再去其他文件找回源定义。
+    zone api_proxy_backend 64k;
+    server api-service:80 resolve max_fails=3 fail_timeout=15s;
+    least_conn;
+    keepalive 64;
+}
+
 server {
     listen 80;
     server_name api.example.com;
@@ -37,6 +45,6 @@ server {
         # 普通 API 模板默认带基础限流，压测后可再调 burst 和 rate。
         limit_req zone=per_ip_api burst=40 nodelay;
         include /etc/nginx/snippets/proxy-common.conf;
-        proxy_pass http://api_backend;
+        proxy_pass http://api_proxy_backend;
     }
 }

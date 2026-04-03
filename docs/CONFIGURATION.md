@@ -48,9 +48,12 @@
 
 - [openresty/conf.d/01-upstreams.conf](/data/openresty-install/openresty/conf.d/01-upstreams.conf)
 
-负责后端服务拓扑定义。
+当前文件只保留为预留占位，不再承载业务 upstream。
 
-当前 upstream 已按运行期 DNS 解析方式配置，因此主栈不再强依赖本地示例后端必须存在。
+当前仓库的业务约定是：
+
+- 只要某个站点模板用到了 upstream，就直接写在当前子配置文件里
+- 这样复制、迁移、回滚时能尽量保持单文件闭环
 
 ### 2.4 可选真实 IP
 
@@ -116,10 +119,12 @@ capacity = {
 复制：
 
 - [waitroom-enrollment-gateway.conf.example](/data/openresty-install/openresty/conf.d/waitroom-enrollment-gateway.conf.example)
+- [waitroom-java-gateway.conf.example](/data/openresty-install/openresty/conf.d/waitroom-java-gateway.conf.example)
 
 改成你的新系统文件，例如：
 
 - `campus-a-enrollment-gateway.conf`
+- `campus-a-java-gateway.conf`
 
 ### 第二步：修改域名和策略 ID
 
@@ -152,6 +157,12 @@ campus_a_enroll = {
 - 确认
 - 支付
 - 订单查询
+
+如果你们的入口统一先打到 Java gateway，再由 Java gateway 向后路由多个服务，建议直接使用：
+
+- [openresty/conf.d/waitroom-java-gateway.conf.example](/data/openresty-install/openresty/conf.d/waitroom-java-gateway.conf.example)
+
+这个模板会把业务路径统一反向代理到单个 Java gateway upstream，后面的 Nacos 和服务拓扑由 Java gateway 自己处理。
 
 ### 第五步：校验并测试
 
@@ -284,6 +295,11 @@ make reload
 - 一类系统一套策略
 - 先改策略，再改代码
 - 默认参数只用于测试，不直接用于生产
+
+补充：
+
+- 当前业务 upstream 建议全部内联在各自子配置文件里
+- `01-upstreams.conf` 只保留为预留占位文件
 
 ## 11. 相关文档
 

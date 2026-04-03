@@ -1,16 +1,18 @@
-# 第二阶段等待室模板
-# 适合抢课、报名、秒杀、预约放号等热点活动入口。
+# 第二阶段等待室 + Java gateway 模板
+# 适合 OpenResty 只负责等待室治理，业务请求统一转发到 Java gateway 的场景。
+# 例如：
+# OpenResty -> java-gateway -> Nacos / 多个后端服务
 
-upstream waitroom_demo_backend {
-    # 等待室演示模板默认回源到 echo/httpbin，方便本地联调。
-    zone waitroom_demo_backend 64k;
-    server echo-service:8080 resolve max_fails=3 fail_timeout=15s;
+upstream waitroom_java_gateway_backend {
+    # 当前模板把 upstream 直接写在子配置里，方便单文件维护和回滚。
+    zone waitroom_java_gateway_backend 64k;
+    server java-gateway:8080 resolve max_fails=3 fail_timeout=15s;
     keepalive 64;
 }
 
 server {
     listen 80;
-    server_name enroll.example.com;
+    server_name enroll-gateway.example.com;
 
     location ^~ /.well-known/acme-challenge/ {
         root /var/www/certbot;
@@ -26,71 +28,66 @@ server {
 server {
     listen 443 ssl;
     http2 on;
-    server_name enroll.example.com;
+    server_name enroll-gateway.example.com;
 
-    # 这个模板的核心不是普通限流，而是等待室策略 + 已准入关键路径保护。
-    access_log /var/log/openresty/enroll.example.com.access.log structured_json buffer=256k flush=1s;
-    error_log  /var/log/openresty/enroll.example.com.error.log warn;
+    # OpenResty 负责等待室和关键路径保护，Java gateway 继续负责后端路由。
+    access_log /var/log/openresty/enroll-gateway.example.com.access.log structured_json buffer=256k flush=1s;
+    error_log  /var/log/openresty/enroll-gateway.example.com.error.log warn;
 
-    # 复制模板时，优先替换 admission_policy 为你自己的活动策略。
     set $admission_policy course_enroll_demo;
 
-    ssl_certificate     /etc/letsencrypt/live/enroll.example.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/enroll.example.com/privkey.pem;
+    ssl_certificate     /etc/letsencrypt/live/enroll-gateway.example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/enroll-gateway.example.com/privkey.pem;
     include /etc/nginx/snippets/ssl-common.conf;
     include /etc/nginx/snippets/security-headers.conf;
 
     root /usr/local/openresty/nginx/html;
 
     location = /waitroom.html {
-        # 等待页静态入口，前端通常会轮询 status 接口查看排队进度。
         try_files /waitroom/index.html =404;
     }
 
     location = /api/enroll/submit {
-        # 新用户进入等待室的入口；默认按用户标识做 join 限流。
         limit_req zone=per_waitroom_identity_join burst=10 nodelay;
         content_by_lua_file /etc/nginx/lua/admission/content_join.lua;
     }
 
     location = /api/queue/status {
-        # 前端轮询排队状态；默认轮询频率限制比 join 更严格。
         limit_req zone=per_waitroom_identity_poll burst=5 nodelay;
         content_by_lua_file /etc/nginx/lua/admission/content_status.lua;
     }
 
     location = /api/ops/waitroom/summary {
-        # 只读运维摘要接口，用于查看活跃准入数、排队人数和容量参数。
         content_by_lua_file /etc/nginx/lua/admission/content_summary.lua;
     }
 
     location = /api/cart/add {
-        # 下面这些关键路径只允许已准入用户继续访问。
         access_by_lua_file /etc/nginx/lua/admission/access_protected.lua;
         include /etc/nginx/snippets/proxy-common.conf;
-        proxy_pass http://waitroom_demo_backend/anything/cart/add;
+        proxy_pass http://waitroom_java_gateway_backend;
     }
 
     location = /api/checkout/confirm {
         access_by_lua_file /etc/nginx/lua/admission/access_protected.lua;
         include /etc/nginx/snippets/proxy-common.conf;
-        proxy_pass http://waitroom_demo_backend/anything/checkout/confirm;
+        proxy_pass http://waitroom_java_gateway_backend;
     }
 
     location = /api/pay/create {
         access_by_lua_file /etc/nginx/lua/admission/access_protected.lua;
         include /etc/nginx/snippets/proxy-common.conf;
-        proxy_pass http://waitroom_demo_backend/anything/pay/create;
+        proxy_pass http://waitroom_java_gateway_backend;
     }
 
     location = /api/order/status {
         access_by_lua_file /etc/nginx/lua/admission/access_protected.lua;
         include /etc/nginx/snippets/proxy-common.conf;
-        proxy_pass http://waitroom_demo_backend/anything/order/status;
+        proxy_pass http://waitroom_java_gateway_backend;
     }
 
     location / {
-        # 默认根路径只返回占位文本，实际项目通常会替换成活动首页或跳转逻辑。
-        return 200 "enroll gateway ready\n";
+        # 普通业务请求也统一交给 Java gateway。
+        include /etc/nginx/snippets/proxy-common.conf;
+        proxy_pass http://waitroom_java_gateway_backend;
     }
 }

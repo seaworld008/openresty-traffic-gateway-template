@@ -67,6 +67,18 @@
 
 示例站点位于 [openresty/conf.d/waitroom-enrollment-gateway.conf.example](/data/openresty-install/openresty/conf.d/waitroom-enrollment-gateway.conf.example)。
 
+如果你的真实架构是：
+
+```text
+OpenResty -> Java gateway -> Nacos / 多个后端服务
+```
+
+也可以直接参考：
+
+- [openresty/conf.d/waitroom-java-gateway.conf.example](/data/openresty-install/openresty/conf.d/waitroom-java-gateway.conf.example)
+
+这种模式下，OpenResty 只负责等待室和关键路径保护，业务请求统一转发给 Java gateway。
+
 路径拆分：
 
 - `/api/enroll/submit`
@@ -153,7 +165,7 @@ cp openresty/conf.d/10-real-ip.conf.example openresty/conf.d/10-real-ip.conf
 
 - 不走重的 body 改写逻辑
 - 不把关键路径放在复杂动态路由之下
-- 关键链路使用静态 upstream
+- 关键链路使用当前子配置文件中定义的静态 upstream
 - 准入成功后，后续关键路径主要做本地令牌校验
 - Redis 查询集中在等待室入口和状态查询接口
 

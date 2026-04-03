@@ -1,6 +1,20 @@
 # 第一层风控 / 限流 / 简单熔断模板
 # 适合给现有业务入口快速叠加基础保护能力。
 
+upstream risk_gateway_frontend_backend {
+    # 风控模板的正常回源。
+    zone risk_gateway_frontend_backend 64k;
+    server frontend:80 resolve max_fails=3 fail_timeout=15s;
+    keepalive 32;
+}
+
+upstream risk_gateway_unstable_backend {
+    # 专门给熔断演示用的故障 upstream。
+    zone risk_gateway_unstable_backend 64k;
+    server 127.0.0.1:65535 max_fails=1 fail_timeout=5s;
+    keepalive 4;
+}
+
 server {
     listen 80;
     server_name risk.example.com;
@@ -27,7 +41,7 @@ server {
 
     # 复制模板时，优先改 policy 名称和默认 upstream。
     set $gateway_policy risk_gateway;
-    set $gateway_upstream frontend_backend;
+    set $gateway_upstream risk_gateway_frontend_backend;
     set $gateway_upstream_uri $request_uri;
     set $gateway_route risk_default;
     set $gateway_request_id "";

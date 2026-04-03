@@ -87,6 +87,7 @@
 
 - [openresty/lua/admission](/data/openresty-install/openresty/lua/admission)
 - [openresty/conf.d/waitroom-enrollment-gateway.conf.example](/data/openresty-install/openresty/conf.d/waitroom-enrollment-gateway.conf.example)
+- [openresty/conf.d/waitroom-java-gateway.conf.example](/data/openresty-install/openresty/conf.d/waitroom-java-gateway.conf.example)
 - [openresty/html/waitroom/index.html](/data/openresty-install/openresty/html/waitroom/index.html)
 - [docs/SCENARIO_GUIDE.md](/data/openresty-install/docs/SCENARIO_GUIDE.md)
 
@@ -220,6 +221,14 @@ OpenResty 经常看不到真实客户端 IP，只能看到统一的上游出口 
 - 绑定域名
 - 指定关键路径
 - 指定回源 upstream
+
+当前仓库约定：业务 upstream 也直接写在各自站点模板中。
+
+这样做的原因是：
+
+- 复制模板时更容易保持单文件闭环
+- 回滚时不用跨多个配置文件同步修改
+- 对“等待室 -> Java gateway”这类单系统入口尤其友好
 
 ## 8. 当前架构的边界
 

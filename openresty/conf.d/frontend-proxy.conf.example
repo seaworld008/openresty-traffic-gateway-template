@@ -1,6 +1,13 @@
 # 普通前端站点模板
 # 适合官网、活动页、BFF 前端入口等常规反向代理场景。
 
+upstream frontend_proxy_backend {
+    # 当前模板自带 upstream，方便单文件复制和维护。
+    zone frontend_proxy_backend 64k;
+    server frontend:80 resolve max_fails=3 fail_timeout=15s;
+    keepalive 32;
+}
+
 server {
     listen 80;
     server_name web.example.com;
@@ -34,6 +41,6 @@ server {
     location / {
         # 前端站点默认直接回源到 frontend_backend。
         include /etc/nginx/snippets/proxy-common.conf;
-        proxy_pass http://frontend_backend;
+        proxy_pass http://frontend_proxy_backend;
     }
 }
