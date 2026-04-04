@@ -143,6 +143,46 @@
         font-size: 13px;
       }
 
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 22px;
+      }
+
+      .action-button {
+        appearance: none;
+        border: 0;
+        border-radius: 999px;
+        padding: 12px 18px;
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 1;
+        cursor: pointer;
+        transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+      }
+
+      .action-button:active {
+        transform: translateY(1px);
+      }
+
+      .action-button:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+      }
+
+      .action-primary {
+        background: var(--accent);
+        color: #fff;
+        box-shadow: 0 10px 24px rgba(23, 109, 74, 0.18);
+      }
+
+      .action-secondary {
+        background: rgba(255, 255, 255, 0.86);
+        color: var(--accent);
+        border: 1px solid rgba(23, 109, 74, 0.16);
+      }
+
       @media (max-width: 480px) {
         main {
           padding: 56px 16px 32px;
@@ -168,6 +208,14 @@
 
         .tips {
           font-size: 13px;
+        }
+
+        .actions {
+          flex-direction: column;
+        }
+
+        .action-button {
+          width: 100%;
         }
       }
 
@@ -197,10 +245,23 @@
           <li>若等待时间较长，也请放心，当前只是按顺序安排进入，并非系统故障。</li>
         </ul>
         <p class="status-note">如当前页面来自业务系统跳转，请优先返回原页面继续操作，不必重复进入。</p>
+        <div class="actions">
+          <button type="button" class="action-button action-primary" id="refreshButton">重新查看状态</button>
+          <button type="button" class="action-button action-secondary" id="backButton">返回原页面</button>
+        </div>
       </div>
     </main>
     <script>
       (function () {
+        var ticket = getQueryParam("ticket");
+        var userId = getQueryParam("user_id");
+        var aheadNode = document.getElementById("ahead");
+        var statusNode = document.getElementById("status");
+        var refreshButton = document.getElementById("refreshButton");
+        var backButton = document.getElementById("backButton");
+        var pollTimer = null;
+        var pollInFlight = false;
+
         function getQueryParam(name) {
           var pattern = new RegExp("(?:[?&])" + name + "=([^&]*)");
           var match = pattern.exec(window.location.search || "");
@@ -210,6 +271,37 @@
         function setStatus(aheadText, statusText) {
           aheadNode.textContent = aheadText;
           statusNode.textContent = statusText;
+        }
+
+        function cancelScheduledPoll() {
+          if (pollTimer) {
+            clearTimeout(pollTimer);
+            pollTimer = null;
+          }
+        }
+
+        function scheduleNextPoll(seconds) {
+          cancelScheduledPoll();
+          pollTimer = setTimeout(poll, seconds * 1000);
+        }
+
+        function setRefreshState(disabled) {
+          refreshButton.disabled = disabled;
+          refreshButton.textContent = disabled ? "状态更新中..." : "重新查看状态";
+        }
+
+        function goBackToSource() {
+          if (document.referrer) {
+            window.location.href = document.referrer;
+            return;
+          }
+
+          if (window.history.length > 1) {
+            window.history.back();
+            return;
+          }
+
+          window.location.href = "/";
         }
 
         function requestStatus(onSuccess, onError) {
@@ -247,25 +339,40 @@
         }
 
         function poll() {
+          if (pollInFlight) {
+            return;
+          }
+
           if (!ticket || !userId) {
             setStatus("-", "当前排队凭证尚未准备好，请返回原页面后重新进入。");
             return;
           }
 
+          pollInFlight = true;
+          setRefreshState(true);
+
           requestStatus(function (data) {
+            pollInFlight = false;
+            setRefreshState(false);
+
             if (data.status === "admitted") {
+              cancelScheduledPoll();
               setStatus("0", "已为你安排进入，请返回原页面继续后续报名流程。");
               return;
             }
 
             if (data.status !== "queued") {
+              cancelScheduledPoll();
               setStatus("-", "当前状态正在更新，请稍后返回原页面重新查看。");
               return;
             }
 
             setStatus(String(data.ahead_count != null ? data.ahead_count : "-"), "正在排队中，建议 " + (data.poll_after_seconds || 3) + " 秒后再查看最新状态。");
-            setTimeout(poll, (data.poll_after_seconds || 3) * 1000);
+            scheduleNextPoll(data.poll_after_seconds || 3);
           }, function (error) {
+            pollInFlight = false;
+            setRefreshState(false);
+            cancelScheduledPoll();
             setStatus("-", "当前状态获取失败，请稍后再试，或返回原页面重新进入。");
             if (window.console && window.console.error) {
               window.console.error("waitroom poll failed:", error);
@@ -273,10 +380,14 @@
           });
         }
 
-        var ticket = getQueryParam("ticket");
-        var userId = getQueryParam("user_id");
-        var aheadNode = document.getElementById("ahead");
-        var statusNode = document.getElementById("status");
+        refreshButton.addEventListener("click", function () {
+          cancelScheduledPoll();
+          poll();
+        });
+
+        backButton.addEventListener("click", function () {
+          goBackToSource();
+        });
 
         poll();
       })();
