@@ -60,12 +60,12 @@ container_is_running() {
 test_config() {
   if container_is_running; then
     echo "使用运行中的 OpenResty 容器检查配置"
-    compose_run exec -T "${SERVICE_NAME}" openresty -t -q
+    compose_run exec -T "${SERVICE_NAME}" openresty -t
     return 0
   fi
 
   echo "OpenResty 容器未运行，使用临时容器检查配置"
-  compose_run run --rm --no-deps --entrypoint openresty "${SERVICE_NAME}" -t -q
+  compose_run run --rm --no-deps --entrypoint openresty "${SERVICE_NAME}" -t
 }
 
 reload_config() {
