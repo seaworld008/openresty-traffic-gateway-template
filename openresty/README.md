@@ -10,6 +10,13 @@ cp .env.example .env
 docker compose up -d
 ```
 
+生产环境首次启动前，请生成强随机密钥并写入 `.env`：
+
+```bash
+sed -i "s|^GATEWAY_QUEUE_SECRET=.*|GATEWAY_QUEUE_SECRET=$(openssl rand -base64 48 | tr -d '\n')|" .env
+sed -i "s|^GATEWAY_OPS_TOKEN=.*|GATEWAY_OPS_TOKEN=$(openssl rand -base64 32 | tr -d '\n')|" .env
+```
+
 `docker-compose.yml` 中所有 bind mount 都使用相对路径，例如：
 
 ```yaml
