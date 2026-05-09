@@ -11,14 +11,28 @@
 2. 第二阶段高并发等待室能力
    路径：`openresty/lua/admission/`
 
-## 2. 修改原则
+## 2. 部署目录约定
+
+- 生产部署只使用 `openresty/` 目录。
+- 如果要部署到服务器，请只复制或拉取仓库的 `openresty/` 子目录，并把它作为运行目录，例如 `/data/openresty`。
+- 部署时进入该目录执行：
+
+```bash
+cp .env.example .env
+docker compose up -d
+```
+
+- 根目录是维护项目使用的区域，用于文档、示例、测试脚本和协作说明，不是生产运行目录。
+- 根目录不应放置生产用 `docker-compose.yml` 或 `.env.example`，避免误导人类或 AI agent 从错误目录部署。
+
+## 3. 修改原则
 
 - 优先保持结构清晰，不要把逻辑重新堆回单个大文件。
 - 新增域名时优先复制站点文件，不要把多个系统混在同一个 `server` 中。
 - 公共逻辑优先放到 `lua/` 模块或 `snippets/`，站点文件只负责组装。
 - 默认保持中文注释和中文文档。
 
-## 3. 文档同步要求
+## 4. 文档同步要求
 
 只要改动了配置、策略、脚本或模块，必须同步检查并更新对应文档。
 
@@ -39,7 +53,7 @@
 - `openresty/lua/gateway/README.md`
 - `openresty/lua/admission/README.md`
 
-## 4. 测试同步要求
+## 5. 测试同步要求
 
 如果改动影响第一层公共能力，至少检查：
 
@@ -55,13 +69,13 @@
 
 - `examples/scripts/run_comprehensive_validation.sh`
 
-## 5. 真实 IP 约定
+## 6. 真实 IP 约定
 
 - 默认不要把真实 IP 当成核心依赖。
 - 默认优先按 `X-User-Id / 业务 Cookie / user_id` 识别用户。
 - 只有环境能可靠透传真实 IP 时，才启用 `openresty/conf.d/10-real-ip.conf.example`。
 
-## 6. 第二阶段容量约定
+## 7. 第二阶段容量约定
 
 第二阶段等待室策略采用两层容量：
 
@@ -70,7 +84,7 @@
 
 不要再退回单一 `max_active` 语义。
 
-## 7. 改动完成后的最小检查
+## 8. 改动完成后的最小检查
 
 至少执行：
 
