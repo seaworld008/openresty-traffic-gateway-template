@@ -152,8 +152,10 @@ Internet -> OpenResty
 ├── .env.example
 ├── README.md
 ├── docs/plans/
-├── openresty/
+├── openresty/                # 可直接复制为 /data/openresty 的自包含部署目录
 │   ├── nginx.conf
+│   ├── docker-compose.yml
+│   ├── .env.example
 │   ├── conf.d/
 │   │   ├── 00-global.conf
 │   │   ├── 01-upstreams.conf

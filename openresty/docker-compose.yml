@@ -1,0 +1,42 @@
+services:
+  openresty:
+    image: ${OPENRESTY_IMAGE:-openresty/openresty:1.29.2.3-bookworm-fat}
+    container_name: openresty-gateway
+    restart: unless-stopped
+    environment:
+      TZ: ${TZ:-Asia/Shanghai}
+      GATEWAY_REDIS_HOST: ${GATEWAY_REDIS_HOST:-redis}
+      GATEWAY_REDIS_PORT: ${GATEWAY_REDIS_PORT:-6379}
+      GATEWAY_REDIS_DB: ${GATEWAY_REDIS_DB:-0}
+      GATEWAY_REDIS_PASSWORD: ${GATEWAY_REDIS_PASSWORD:-}
+      GATEWAY_REDIS_TIMEOUT_MS: ${GATEWAY_REDIS_TIMEOUT_MS:-1000}
+      GATEWAY_METADATA_CACHE_TTL_SECONDS: ${GATEWAY_METADATA_CACHE_TTL_SECONDS:-10}
+      GATEWAY_GRAY_FLAG_CACHE_TTL_SECONDS: ${GATEWAY_GRAY_FLAG_CACHE_TTL_SECONDS:-2}
+      GATEWAY_RESPONSE_REWRITE_MAX_BYTES: ${GATEWAY_RESPONSE_REWRITE_MAX_BYTES:-262144}
+      GATEWAY_QUEUE_SECRET: ${GATEWAY_QUEUE_SECRET:-change-this-before-production}
+      GATEWAY_ADMISSION_COOKIE_NAME: ${GATEWAY_ADMISSION_COOKIE_NAME:-gw_admission}
+      GATEWAY_OPS_TOKEN: ${GATEWAY_OPS_TOKEN:-change-this-before-production}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/usr/local/openresty/nginx/conf/nginx.conf:ro
+      - ./conf.d:/etc/nginx/conf.d:ro
+      - ./snippets:/etc/nginx/snippets:ro
+      - ./lua:/etc/nginx/lua:ro
+      - ./logs:/var/log/openresty
+      - ./cache:/var/cache/openresty
+      - ./html:/usr/local/openresty/nginx/html:ro
+      - ./certs:/etc/letsencrypt
+    healthcheck:
+      test: ["CMD-SHELL", "openresty -t"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - gateway
+
+networks:
+  gateway:
+    driver: bridge
