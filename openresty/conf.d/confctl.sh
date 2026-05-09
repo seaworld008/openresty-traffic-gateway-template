@@ -6,9 +6,9 @@ SERVICE_NAME="openresty"
 COMPOSE_FILE_NAME="docker-compose.yml"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
-COMPOSE_FILE="${REPO_ROOT}/${COMPOSE_FILE_NAME}"
-ENV_FILE="${REPO_ROOT}/.env"
+DEPLOY_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+COMPOSE_FILE="${DEPLOY_ROOT}/${COMPOSE_FILE_NAME}"
+ENV_FILE="${DEPLOY_ROOT}/.env"
 COMPOSE_BIN=()
 
 usage() {

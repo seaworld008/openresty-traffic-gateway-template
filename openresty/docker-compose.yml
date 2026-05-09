@@ -28,6 +28,7 @@ services:
       - ./cache:/var/cache/openresty
       - ./html:/usr/local/openresty/nginx/html:ro
       - ./certs:/etc/letsencrypt
+      - ./certs/www:/var/www/certbot
     healthcheck:
       test: ["CMD-SHELL", "openresty -t"]
       interval: 30s

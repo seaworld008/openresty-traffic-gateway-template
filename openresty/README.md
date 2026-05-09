@@ -22,4 +22,6 @@ docker compose up -d
 ./certs
 ```
 
+如果使用 HTTP-01 ACME challenge，challenge webroot 位于 `./certs/www`，容器内对应 `/var/www/certbot`。
+
 仓库根目录用于维护文档、示例和测试脚本，不是生产运行目录。
