@@ -6,7 +6,22 @@
 [![Examples](https://img.shields.io/badge/Examples-Non--LLM_Tested-success)](/data/openresty-install/examples/scripts/run_comprehensive_validation.sh)
 [![Last Commit](https://img.shields.io/github/last-commit/seaworld008/openresty-traffic-gateway-template/main?color=0f766e)](https://github.com/seaworld008/openresty-traffic-gateway-template/commits/main)
 
-这个仓库是一套面向中小团队的 OpenResty 自建部署模板，目标不是“能跑起来就行”，而是尽量贴近生产可维护实践：单台 Linux 主机、Docker Compose 部署、所有持久化状态都放在当前仓库目录、目录结构清晰，后续其他项目可以直接 clone 后快速启动。
+这个仓库是一套面向中小团队的 OpenResty 自建部署模板，目标不是“能跑起来就行”，而是尽量贴近生产可维护实践：单台 Linux 主机、Docker Compose 部署、目录结构清晰，后续其他项目可以复用 `openresty/` 运行目录快速启动。
+
+## 部署入口
+
+生产部署只使用 [openresty/](openresty/) 目录。仓库根目录用于维护文档、示例、测试脚本和协作说明，不是生产运行目录。
+
+部署到服务器时，请只复制或拉取 `openresty/` 子目录，例如：
+
+```bash
+cp -a openresty /data/openresty
+cd /data/openresty
+cp .env.example .env
+docker compose up -d
+```
+
+AI agent 或自动化脚本部署时也必须遵守这个约定：只部署 `tree/main/openresty` 目录下的内容。根目录下的 `docs/`、`examples/`、`Makefile`、`AGENTS.md` 等只用于维护项目本身。
 
 推荐 GitHub 中文描述：
 
@@ -148,14 +163,13 @@ Internet -> OpenResty
 
 ```text
 .
-├── docker-compose.yml
-├── .env.example
 ├── README.md
 ├── docs/plans/
-├── openresty/                # 可直接复制为 /data/openresty 的自包含部署目录
+├── openresty/                # 唯一生产部署目录，可直接复制为 /data/openresty
 │   ├── nginx.conf
 │   ├── docker-compose.yml
 │   ├── .env.example
+│   ├── README.md
 │   ├── conf.d/
 │   │   ├── 00-global.conf
 │   │   ├── 01-upstreams.conf
@@ -178,11 +192,6 @@ Internet -> OpenResty
 │   ├── certs/
 │   ├── html/
 │   └── lua/
-├── ssl/
-│   ├── acme/
-│   ├── certbot/
-│   ├── scripts/
-│   └── README.md
 └── examples/
 ```
 

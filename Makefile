@@ -3,53 +3,50 @@
 .PHONY: init local-certs pull up down up-local down-local restart ps logs check reload renew clean redis-test-up redis-test-down conf-examples-on conf-examples-off test-first-layer test-waitroom benchmark-waitroom waitroom-summary benchmark-gateway test-comprehensive
 
 init:
-	cp -n .env.example .env || true
-	mkdir -p openresty/logs openresty/cache ssl/certbot/conf ssl/certbot/www
-	chmod +x ssl/scripts/*.sh
+	cp -n openresty/.env.example openresty/.env || true
+	mkdir -p openresty/logs openresty/cache openresty/certs
 
 local-certs:
 	./ssl/scripts/init-local-certs.sh
 
 pull:
-	docker compose pull openresty
-	docker compose --profile ops pull certbot
+	docker compose --project-directory openresty -f openresty/docker-compose.yml pull openresty
 
 up:
-	docker compose up -d
+	docker compose --project-directory openresty -f openresty/docker-compose.yml up -d
 
 down:
-	docker compose down
+	docker compose --project-directory openresty -f openresty/docker-compose.yml down
 
 up-local:
-	docker compose -f docker-compose.yml -f examples/backend/docker-compose.local.yml up -d
+	DOCKER_NETWORK_NAME=openresty_gateway docker compose -f openresty/docker-compose.yml -f examples/backend/docker-compose.local.yml up -d
 
 down-local:
-	docker compose -f docker-compose.yml -f examples/backend/docker-compose.local.yml down --remove-orphans
+	DOCKER_NETWORK_NAME=openresty_gateway docker compose -f openresty/docker-compose.yml -f examples/backend/docker-compose.local.yml down --remove-orphans
 
 restart:
-	docker compose down
-	docker compose up -d
+	docker compose --project-directory openresty -f openresty/docker-compose.yml down
+	docker compose --project-directory openresty -f openresty/docker-compose.yml up -d
 
 ps:
-	docker compose ps
+	docker compose --project-directory openresty -f openresty/docker-compose.yml ps
 
 logs:
-	docker compose logs -f openresty
+	docker compose --project-directory openresty -f openresty/docker-compose.yml logs -f openresty
 
 check:
-	bash -n ssl/scripts/*.sh
-	docker compose config >/dev/null
-	docker compose exec -T openresty openresty -t
+	docker compose --project-directory openresty -f openresty/docker-compose.yml config >/dev/null
+	docker compose --project-directory openresty -f openresty/docker-compose.yml exec -T openresty openresty -t
 
 reload:
-	./ssl/scripts/reload-openresty.sh
+	docker compose --project-directory openresty -f openresty/docker-compose.yml exec -T openresty openresty -s reload
 
 renew:
-	./ssl/scripts/renew-cert.sh
+	@echo "证书续签请在具体生产环境中按 openresty/certs 挂载策略处理"
 
 redis-test-up:
 	docker rm -f openresty-local-redis >/dev/null 2>&1 || true
-	docker run -d --name openresty-local-redis --network openresty-install_gateway --network-alias redis redis:7.2.5-alpine
+	docker run -d --name openresty-local-redis --network openresty_gateway --network-alias redis redis:7.2.5-alpine
 
 redis-test-down:
 	docker rm -f openresty-local-redis >/dev/null 2>&1 || true
@@ -79,4 +76,4 @@ test-comprehensive:
 	bash examples/scripts/run_comprehensive_validation.sh
 
 clean:
-	docker compose down
+	docker compose --project-directory openresty -f openresty/docker-compose.yml down

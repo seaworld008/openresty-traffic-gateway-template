@@ -7,7 +7,7 @@ REPO_ROOT=$(cd "${SCRIPT_DIR}/../.." && pwd)
 
 cd "${REPO_ROOT}"
 
-COMPOSE_LOCAL=(docker compose -f docker-compose.yml -f examples/backend/docker-compose.local.yml)
+COMPOSE_LOCAL=(env DOCKER_NETWORK_NAME=openresty_gateway docker compose -f openresty/docker-compose.yml -f examples/backend/docker-compose.local.yml)
 TEST_REDIS_PASSWORD="${TEST_REDIS_PASSWORD:-openresty-test-redis-pass}"
 
 set_env_value() {
@@ -43,17 +43,17 @@ wait_for_openresty() {
   exit 1
 }
 
-cp -f .env.example .env
-set_env_value .env GATEWAY_REDIS_PASSWORD "${TEST_REDIS_PASSWORD}"
+cp -f openresty/.env.example openresty/.env
+set_env_value openresty/.env GATEWAY_REDIS_PASSWORD "${TEST_REDIS_PASSWORD}"
 rm -f openresty/conf.d/10-real-ip.conf
 bash examples/scripts/activate_conf_examples.sh >/dev/null
 ("${COMPOSE_LOCAL[@]}" down --remove-orphans) >/dev/null 2>&1 || true
-docker compose down >/dev/null 2>&1 || true
-docker compose up -d >/dev/null
+docker compose --project-directory openresty -f openresty/docker-compose.yml down >/dev/null 2>&1 || true
+docker compose --project-directory openresty -f openresty/docker-compose.yml up -d >/dev/null
 sleep 2
 ("${COMPOSE_LOCAL[@]}" up -d >/dev/null)
 sleep 2
-docker compose restart openresty >/dev/null
+docker compose --project-directory openresty -f openresty/docker-compose.yml restart openresty >/dev/null
 sleep 2
 wait_for_openresty
 
@@ -67,15 +67,15 @@ echo "[3/6] 挂载外部 Redis 测试容器"
 rm -f openresty/conf.d/10-real-ip.conf
 bash examples/scripts/activate_conf_examples.sh >/dev/null
 docker rm -f openresty-local-redis >/dev/null 2>&1 || true
-set_env_value .env GATEWAY_REDIS_PASSWORD "${TEST_REDIS_PASSWORD}"
-docker compose up -d >/dev/null
+set_env_value openresty/.env GATEWAY_REDIS_PASSWORD "${TEST_REDIS_PASSWORD}"
+docker compose --project-directory openresty -f openresty/docker-compose.yml up -d >/dev/null
 sleep 2
 ("${COMPOSE_LOCAL[@]}" up -d >/dev/null)
 sleep 2
-docker compose restart openresty >/dev/null
+docker compose --project-directory openresty -f openresty/docker-compose.yml restart openresty >/dev/null
 sleep 2
 wait_for_openresty
-docker run -d --name openresty-local-redis --network openresty-install_gateway --network-alias redis \
+docker run -d --name openresty-local-redis --network openresty_gateway --network-alias redis \
   redis:7.2.5-alpine redis-server --requirepass "${TEST_REDIS_PASSWORD}" >/dev/null
 sleep 1
 redis_cli SET gateway:partner:test-client \
