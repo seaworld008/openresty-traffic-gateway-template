@@ -32,7 +32,7 @@
 
 ### 策略配置
 
-策略配置位于 [openresty/lua/admission/policies.lua](/data/openresty-install/openresty/lua/admission/policies.lua)。
+策略配置位于 [openresty/lua/admission/policies.lua](../openresty/lua/admission/policies.lua)。
 
 当前示例策略：
 
@@ -65,7 +65,7 @@
 
 ### 路由与站点
 
-示例站点位于 [openresty/conf.d/waitroom-enrollment-gateway.conf.example](/data/openresty-install/openresty/conf.d/waitroom-enrollment-gateway.conf.example)。
+示例站点位于 [openresty/conf.d/waitroom-enrollment-gateway.conf.example](../openresty/conf.d/waitroom-enrollment-gateway.conf.example)。
 
 如果你的真实架构是：
 
@@ -75,7 +75,7 @@ OpenResty -> Java gateway -> Nacos / 多个后端服务
 
 也可以直接参考：
 
-- [openresty/conf.d/waitroom-java-gateway.conf.example](/data/openresty-install/openresty/conf.d/waitroom-java-gateway.conf.example)
+- [openresty/conf.d/waitroom-java-gateway.conf.example](../openresty/conf.d/waitroom-java-gateway.conf.example)
 
 这种模式下，OpenResty 只负责等待室和关键路径保护，业务请求统一转发给 Java gateway。
 
@@ -148,7 +148,7 @@ Redis 只用于等待室和准入状态，不要求每个支付或购物车请�
 
 如果你的环境能可靠透传真实 IP，可以把下面这个示例文件启用：
 
-- [openresty/conf.d/10-real-ip.conf.example](/data/openresty-install/openresty/conf.d/10-real-ip.conf.example)
+- [openresty/conf.d/10-real-ip.conf.example](../openresty/conf.d/10-real-ip.conf.example)
 
 启用方式：
 
@@ -287,7 +287,7 @@ curl -k \
 
 如果你们后续要把等待室接到其他业务域名，建议优先参考：
 
-- [docs/SCENARIO_GUIDE.md](/data/openresty-install/docs/SCENARIO_GUIDE.md)
+- [docs/SCENARIO_GUIDE.md](../docs/SCENARIO_GUIDE.md)
 
 ## 接入到其他业务时的建议
 

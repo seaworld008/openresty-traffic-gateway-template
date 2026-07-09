@@ -23,8 +23,8 @@
 
 推荐模板：
 
-- [openresty/conf.d/frontend-proxy.conf.example](/data/openresty-install/openresty/conf.d/frontend-proxy.conf.example)
-- [openresty/conf.d/static-local-root.conf.example](/data/openresty-install/openresty/conf.d/static-local-root.conf.example)
+- [openresty/conf.d/frontend-proxy.conf.example](../openresty/conf.d/frontend-proxy.conf.example)
+- [openresty/conf.d/static-local-root.conf.example](../openresty/conf.d/static-local-root.conf.example)
 
 特点：
 
@@ -43,8 +43,8 @@
 
 推荐模板：
 
-- [openresty/conf.d/api-proxy.conf.example](/data/openresty-install/openresty/conf.d/api-proxy.conf.example)
-- [openresty/conf.d/admin-console-proxy.conf.example](/data/openresty-install/openresty/conf.d/admin-console-proxy.conf.example)
+- [openresty/conf.d/api-proxy.conf.example](../openresty/conf.d/api-proxy.conf.example)
+- [openresty/conf.d/admin-console-proxy.conf.example](../openresty/conf.d/admin-console-proxy.conf.example)
 
 特点：
 
@@ -63,14 +63,14 @@
 
 推荐模板：
 
-- [openresty/conf.d/risk-protected-proxy.conf.example](/data/openresty-install/openresty/conf.d/risk-protected-proxy.conf.example)
-- [openresty/conf.d/partner-api-gateway.conf.example](/data/openresty-install/openresty/conf.d/partner-api-gateway.conf.example)
-- [openresty/conf.d/gray-release-proxy.conf.example](/data/openresty-install/openresty/conf.d/gray-release-proxy.conf.example)
+- [openresty/conf.d/risk-protected-proxy.conf.example](../openresty/conf.d/risk-protected-proxy.conf.example)
+- [openresty/conf.d/partner-api-gateway.conf.example](../openresty/conf.d/partner-api-gateway.conf.example)
+- [openresty/conf.d/gray-release-proxy.conf.example](../openresty/conf.d/gray-release-proxy.conf.example)
 
 特点：
 
 - 站点层只绑定 `gateway_policy`
-- 能力下沉到 [openresty/lua/gateway](/data/openresty-install/openresty/lua/gateway)
+- 能力下沉到 [openresty/lua/gateway](../openresty/lua/gateway)
 - 适合“一个老 API 站点逐步加能力”
 
 ### 场景 D：热点活动入口 / 等待室
@@ -85,8 +85,8 @@
 
 推荐模板：
 
-- [openresty/conf.d/waitroom-enrollment-gateway.conf.example](/data/openresty-install/openresty/conf.d/waitroom-enrollment-gateway.conf.example)
-- [openresty/conf.d/waitroom-java-gateway.conf.example](/data/openresty-install/openresty/conf.d/waitroom-java-gateway.conf.example)
+- [openresty/conf.d/waitroom-enrollment-gateway.conf.example](../openresty/conf.d/waitroom-enrollment-gateway.conf.example)
+- [openresty/conf.d/waitroom-java-gateway.conf.example](../openresty/conf.d/waitroom-java-gateway.conf.example)
 
 特点：
 
@@ -153,7 +153,7 @@ cd openresty/conf.d
 
 推荐起点：
 
-- [openresty/conf.d/frontend-proxy.conf.example](/data/openresty-install/openresty/conf.d/frontend-proxy.conf.example)
+- [openresty/conf.d/frontend-proxy.conf.example](../openresty/conf.d/frontend-proxy.conf.example)
 
 最小修改点：
 
@@ -179,8 +179,8 @@ curl -k --resolve www.example.com:443:127.0.0.1 https://www.example.com/
 
 推荐起点：
 
-- [openresty/conf.d/api-proxy.conf.example](/data/openresty-install/openresty/conf.d/api-proxy.conf.example)
-- [openresty/conf.d/admin-console-proxy.conf.example](/data/openresty-install/openresty/conf.d/admin-console-proxy.conf.example)
+- [openresty/conf.d/api-proxy.conf.example](../openresty/conf.d/api-proxy.conf.example)
+- [openresty/conf.d/admin-console-proxy.conf.example](../openresty/conf.d/admin-console-proxy.conf.example)
 
 最小修改点：
 
@@ -203,7 +203,7 @@ curl -k --resolve api.example.com:443:127.0.0.1 https://api.example.com/healthz
 
 推荐起点：
 
-- [openresty/conf.d/partner-api-gateway.conf.example](/data/openresty-install/openresty/conf.d/partner-api-gateway.conf.example)
+- [openresty/conf.d/partner-api-gateway.conf.example](../openresty/conf.d/partner-api-gateway.conf.example)
 
 你需要同时改两处：
 
@@ -211,7 +211,7 @@ curl -k --resolve api.example.com:443:127.0.0.1 https://api.example.com/healthz
 设置新的 `gateway_policy`
 
 2. 策略文件
-[openresty/lua/gateway/policies.lua](/data/openresty-install/openresty/lua/gateway/policies.lua) 中增加策略
+[openresty/lua/gateway/policies.lua](../openresty/lua/gateway/policies.lua) 中增加策略
 
 最小步骤：
 
@@ -234,8 +234,8 @@ curl -k --resolve api.example.com:443:127.0.0.1 https://api.example.com/healthz
 
 推荐起点：
 
-- [openresty/conf.d/waitroom-enrollment-gateway.conf.example](/data/openresty-install/openresty/conf.d/waitroom-enrollment-gateway.conf.example)
-- [openresty/conf.d/waitroom-java-gateway.conf.example](/data/openresty-install/openresty/conf.d/waitroom-java-gateway.conf.example)
+- [openresty/conf.d/waitroom-enrollment-gateway.conf.example](../openresty/conf.d/waitroom-enrollment-gateway.conf.example)
+- [openresty/conf.d/waitroom-java-gateway.conf.example](../openresty/conf.d/waitroom-java-gateway.conf.example)
 
 你需要同时改两处：
 
@@ -243,7 +243,7 @@ curl -k --resolve api.example.com:443:127.0.0.1 https://api.example.com/healthz
 设置 `set $admission_policy your_policy`
 
 2. 策略文件
-[openresty/lua/admission/policies.lua](/data/openresty-install/openresty/lua/admission/policies.lua) 中增加策略
+[openresty/lua/admission/policies.lua](../openresty/lua/admission/policies.lua) 中增加策略
 
 必改字段：
 
@@ -338,7 +338,7 @@ location / {
 }
 ```
 
-然后再去 [openresty/lua/gateway/policies.lua](/data/openresty-install/openresty/lua/gateway/policies.lua) 里给这个站点增加策略。
+然后再去 [openresty/lua/gateway/policies.lua](../openresty/lua/gateway/policies.lua) 里给这个站点增加策略。
 
 推荐做法：
 
@@ -399,7 +399,7 @@ location / {
 
 位置：
 
-- [openresty/lua/gateway/policies.lua](/data/openresty-install/openresty/lua/gateway/policies.lua)
+- [openresty/lua/gateway/policies.lua](../openresty/lua/gateway/policies.lua)
 
 适合改：
 
@@ -415,7 +415,7 @@ location / {
 
 位置：
 
-- [openresty/lua/admission/policies.lua](/data/openresty-install/openresty/lua/admission/policies.lua)
+- [openresty/lua/admission/policies.lua](../openresty/lua/admission/policies.lua)
 
 适合改：
 
@@ -510,9 +510,9 @@ make test-comprehensive
 
 ## 11. 相关文档
 
-- [README.md](/data/openresty-install/README.md)
-- [docs/ARCHITECTURE.md](/data/openresty-install/docs/ARCHITECTURE.md)
-- [docs/CONFIGURATION.md](/data/openresty-install/docs/CONFIGURATION.md)
-- [docs/OPERATIONS.md](/data/openresty-install/docs/OPERATIONS.md)
-- [docs/ADD_NEW_SYSTEM.md](/data/openresty-install/docs/ADD_NEW_SYSTEM.md)
-- [examples/waitroom-best-practice.md](/data/openresty-install/examples/waitroom-best-practice.md)
+- [README.md](../README.md)
+- [docs/ARCHITECTURE.md](ARCHITECTURE.md)
+- [docs/CONFIGURATION.md](CONFIGURATION.md)
+- [docs/OPERATIONS.md](OPERATIONS.md)
+- [docs/ADD_NEW_SYSTEM.md](ADD_NEW_SYSTEM.md)
+- [examples/waitroom-best-practice.md](../examples/waitroom-best-practice.md)

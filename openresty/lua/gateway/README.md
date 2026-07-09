@@ -60,4 +60,4 @@
 
 如果你要把这些能力接到一个新站或老站上，实施步骤见：
 
-- [docs/SCENARIO_GUIDE.md](/data/openresty-install/docs/SCENARIO_GUIDE.md)
+- [docs/SCENARIO_GUIDE.md](../../../docs/SCENARIO_GUIDE.md)

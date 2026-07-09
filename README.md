@@ -1,9 +1,9 @@
 # OpenResty 单节点网关最佳实践模板
 
-[![OpenResty](https://img.shields.io/badge/OpenResty-1.29.2.2--1--bookworm--fat-1f2937?logo=nginx&logoColor=white)](https://openresty.org/)
-[![Deploy](https://img.shields.io/badge/Deploy-Docker_Compose-2496ED?logo=docker&logoColor=white)](/data/openresty-install/docker-compose.yml)
-[![Redis](https://img.shields.io/badge/Redis-Password_Tested-DC382D?logo=redis&logoColor=white)](/data/openresty-install/examples/scripts/test-first-layer.sh)
-[![Examples](https://img.shields.io/badge/Examples-Non--LLM_Tested-success)](/data/openresty-install/examples/scripts/run_comprehensive_validation.sh)
+[![OpenResty](https://img.shields.io/badge/OpenResty-1.31.1.1--1--restyrepo-1f2937?logo=nginx&logoColor=white)](https://openresty.org/)
+[![Deploy](https://img.shields.io/badge/Deploy-Docker_Compose-2496ED?logo=docker&logoColor=white)](openresty/docker-compose.yml)
+[![Redis](https://img.shields.io/badge/Redis-Password_Tested-DC382D?logo=redis&logoColor=white)](examples/scripts/test-first-layer.sh)
+[![Examples](https://img.shields.io/badge/Examples-Non--LLM_Tested-success)](examples/scripts/run_comprehensive_validation.sh)
 [![Last Commit](https://img.shields.io/github/last-commit/seaworld008/openresty-traffic-gateway-template/main?color=0f766e)](https://github.com/seaworld008/openresty-traffic-gateway-template/commits/main)
 
 这个仓库是一套面向中小团队的 OpenResty 自建部署模板，目标不是“能跑起来就行”，而是尽量贴近生产可维护实践：单台 Linux 主机、Docker Compose 部署、目录结构清晰，后续其他项目可以复用 `openresty/` 运行目录快速启动。
@@ -53,7 +53,7 @@ AI agent 或自动化脚本部署时也必须遵守这个约定：只部署 `tre
 - 上游失败重试与简单熔断
 - 黑白名单 / UA / IP 风控基础版
 
-这些能力统一下沉在 [openresty/lua/gateway](/data/openresty-install/openresty/lua/gateway)，站点本身只做策略组合，避免各业务域名重复造轮子。
+这些能力统一下沉在 [openresty/lua/gateway](openresty/lua/gateway)，站点本身只做策略组合，避免各业务域名重复造轮子。
 
 ## 第二阶段高并发等待室
 
@@ -66,9 +66,9 @@ AI agent 或自动化脚本部署时也必须遵守这个约定：只部署 `tre
 
 这部分实现位于：
 
-- [openresty/lua/admission](/data/openresty-install/openresty/lua/admission)
-- [openresty/conf.d/waitroom-enrollment-gateway.conf.example](/data/openresty-install/openresty/conf.d/waitroom-enrollment-gateway.conf.example)
-- [examples/waitroom-best-practice.md](/data/openresty-install/examples/waitroom-best-practice.md)
+- [openresty/lua/admission](openresty/lua/admission)
+- [openresty/conf.d/waitroom-enrollment-gateway.conf.example](openresty/conf.d/waitroom-enrollment-gateway.conf.example)
+- [examples/waitroom-best-practice.md](examples/waitroom-best-practice.md)
 
 这一层的目标不是“让所有人都能冲进后端”，而是：
 
@@ -200,7 +200,7 @@ Internet -> OpenResty
 默认 OpenResty 镜像固定为：
 
 ```yaml
-openresty/openresty:1.29.2.2-1-bookworm-fat
+openresty/openresty:1.31.1.1-1-restyrepo
 ```
 
 必须使用完整 tag，而不是 `latest` 或浮动 tag，原因有四个：
@@ -214,9 +214,9 @@ Certbot 镜像也在 `.env.example` 里固定了 tag，理由完全相同。
 
 补充说明：
 
-- 原始目标 tag `openresty/openresty:1.29.2.3-0-bookworm-fat` 在本机实际拉取时返回 `manifest unknown`
-- 因此这里按“官方镜像 + 稳定版本 + 完整 tag”原则，改为已经验证存在的 `openresty/openresty:1.29.2.2-1-bookworm-fat`
-- Certbot 镜像实际可拉取的完整 tag 为 `certbot/certbot:v5.4.0`，需要保留 `v` 前缀
+- 本模板已升级到 OpenResty 官方 Docker 工具链发布的 `1.31.1.1-1-restyrepo` 固定 tag。
+- 该 tag 属于 OpenResty 1.31 发布线，包含更新的 Nginx 核心版本；后续如果安全公告要求升级，应继续按“官方镜像 + 固定完整 tag + 先测试再发布”的方式滚动。
+- 如果你在内网镜像仓库同步官方镜像，也建议保留完整 tag，不要只同步 `latest`、`alpine` 这类浮动标签。
 
 ## GitHub 展示建议
 
@@ -339,7 +339,7 @@ cd openresty/conf.d
 ./confctl.sh test
 ```
 
-然后按 [examples/curl-tests.md](/data/openresty-install/examples/curl-tests.md) 中的步骤做验证。
+然后按 [examples/curl-tests.md](examples/curl-tests.md) 中的步骤做验证。
 
 本地验证结束后，如需恢复干净模板状态，可执行：
 
@@ -423,39 +423,39 @@ docker compose up -d openresty
 
 ### 第一层能力层
 
-公共能力代码位于 [openresty/lua/gateway](/data/openresty-install/openresty/lua/gateway)：
+公共能力代码位于 [openresty/lua/gateway](openresty/lua/gateway)：
 
-- [openresty/lua/gateway/init.lua](/data/openresty-install/openresty/lua/gateway/init.lua)：统一入口，负责把策略、鉴权、风控、路由和改写串起来
-- [openresty/lua/gateway/policies.lua](/data/openresty-install/openresty/lua/gateway/policies.lua)：案例策略配置文件，也是动态路由的配置来源
-- [openresty/lua/gateway/redis_client.lua](/data/openresty-install/openresty/lua/gateway/redis_client.lua)：外部 Redis 连接封装
-- [openresty/lua/gateway/jwt.lua](/data/openresty-install/openresty/lua/gateway/jwt.lua)：HS256 JWT 校验
-- [openresty/lua/gateway/signature.lua](/data/openresty-install/openresty/lua/gateway/signature.lua)：HMAC / 时间戳签名校验
-- [openresty/lua/gateway/risk.lua](/data/openresty-install/openresty/lua/gateway/risk.lua)：IP / UA 风控
-- [openresty/lua/gateway/router.lua](/data/openresty-install/openresty/lua/gateway/router.lua)：配置化路由与灰度决策
-- [openresty/lua/gateway/circuit_breaker.lua](/data/openresty-install/openresty/lua/gateway/circuit_breaker.lua)：基础熔断
-- [openresty/lua/gateway/rewrite.lua](/data/openresty-install/openresty/lua/gateway/rewrite.lua)：请求 Header / Body 改写
-- [openresty/lua/gateway/response.lua](/data/openresty-install/openresty/lua/gateway/response.lua)：响应头与 JSON 响应体补写
+- [openresty/lua/gateway/init.lua](openresty/lua/gateway/init.lua)：统一入口，负责把策略、鉴权、风控、路由和改写串起来
+- [openresty/lua/gateway/policies.lua](openresty/lua/gateway/policies.lua)：案例策略配置文件，也是动态路由的配置来源
+- [openresty/lua/gateway/redis_client.lua](openresty/lua/gateway/redis_client.lua)：外部 Redis 连接封装
+- [openresty/lua/gateway/jwt.lua](openresty/lua/gateway/jwt.lua)：HS256 JWT 校验
+- [openresty/lua/gateway/signature.lua](openresty/lua/gateway/signature.lua)：HMAC / 时间戳签名校验
+- [openresty/lua/gateway/risk.lua](openresty/lua/gateway/risk.lua)：IP / UA 风控
+- [openresty/lua/gateway/router.lua](openresty/lua/gateway/router.lua)：配置化路由与灰度决策
+- [openresty/lua/gateway/circuit_breaker.lua](openresty/lua/gateway/circuit_breaker.lua)：基础熔断
+- [openresty/lua/gateway/rewrite.lua](openresty/lua/gateway/rewrite.lua)：请求 Header / Body 改写
+- [openresty/lua/gateway/response.lua](openresty/lua/gateway/response.lua)：响应头与 JSON 响应体补写
 
 ### 高级案例站点
 
-- [openresty/conf.d/risk-protected-proxy.conf.example](/data/openresty-install/openresty/conf.d/risk-protected-proxy.conf.example)
+- [openresty/conf.d/risk-protected-proxy.conf.example](openresty/conf.d/risk-protected-proxy.conf.example)
   日常风控入口案例，覆盖限流、UA 风控、IP 黑白名单、失败重试和简单熔断。
-- [openresty/conf.d/partner-api-gateway.conf.example](/data/openresty-install/openresty/conf.d/partner-api-gateway.conf.example)
+- [openresty/conf.d/partner-api-gateway.conf.example](openresty/conf.d/partner-api-gateway.conf.example)
   对接型 API 案例，覆盖 JWT、HMAC、Redis 合作方配置、统一请求 ID、Header / Body 改写和动态路由。
-- [openresty/conf.d/gray-release-proxy.conf.example](/data/openresty-install/openresty/conf.d/gray-release-proxy.conf.example)
+- [openresty/conf.d/gray-release-proxy.conf.example](openresty/conf.d/gray-release-proxy.conf.example)
   灰度发布案例，覆盖 Header 灰度、按百分比灰度和 Redis 统一开关。
-- [openresty/conf.d/llm-api-proxy.conf.example](/data/openresty-install/openresty/conf.d/llm-api-proxy.conf.example)
+- [openresty/conf.d/llm-api-proxy.conf.example](openresty/conf.d/llm-api-proxy.conf.example)
   大模型 API 网关模板，适合 OpenAI 兼容接口、内部推理服务与流式输出场景。
-- [openresty/conf.d/llm-relay-token-guard.conf.example](/data/openresty-install/openresty/conf.d/llm-relay-token-guard.conf.example)
+- [openresty/conf.d/llm-relay-token-guard.conf.example](openresty/conf.d/llm-relay-token-guard.conf.example)
   大模型中转源站保护模板，适合只允许本机或可信中转层访问的 relay 场景。
-- [openresty/conf.d/waitroom-enrollment-gateway.conf.example](/data/openresty-install/openresty/conf.d/waitroom-enrollment-gateway.conf.example)
+- [openresty/conf.d/waitroom-enrollment-gateway.conf.example](openresty/conf.d/waitroom-enrollment-gateway.conf.example)
   第二阶段等待室案例，覆盖入口排队、准入通行证、关键步骤保护和通用可调阈值策略。
-- [openresty/conf.d/waitroom-java-gateway.conf.example](/data/openresty-install/openresty/conf.d/waitroom-java-gateway.conf.example)
+- [openresty/conf.d/waitroom-java-gateway.conf.example](openresty/conf.d/waitroom-java-gateway.conf.example)
   第二阶段等待室 + Java gateway 案例，适合 OpenResty 只负责等待室治理，业务请求统一转发到 Java gateway 的架构。
 
 ### 第二阶段策略怎么调
 
-等待室策略位于 [openresty/lua/admission/policies.lua](/data/openresty-install/openresty/lua/admission/policies.lua)。
+等待室策略位于 [openresty/lua/admission/policies.lua](openresty/lua/admission/policies.lua)。
 
 最常调整的是：
 
@@ -483,7 +483,7 @@ docker compose up -d openresty
 
 如果你的环境能可靠透传真实客户端 IP，可以按需启用：
 
-- [openresty/conf.d/10-real-ip.conf.example](/data/openresty-install/openresty/conf.d/10-real-ip.conf.example)
+- [openresty/conf.d/10-real-ip.conf.example](openresty/conf.d/10-real-ip.conf.example)
 
 ## 如何新增一个生产域名
 
@@ -497,7 +497,7 @@ docker compose up -d openresty
 
 如果你要处理的是“老站如何渐进式加限流、风控、熔断”或“热点活动如何接入等待室”，请直接参考：
 
-- [docs/SCENARIO_GUIDE.md](/data/openresty-install/docs/SCENARIO_GUIDE.md)
+- [docs/SCENARIO_GUIDE.md](docs/SCENARIO_GUIDE.md)
   按场景给出可操作步骤、最小改动点、检查命令和回滚建议
 
 ## 日常运维命令
@@ -619,20 +619,20 @@ make test-comprehensive
 
 为方便实施、运维和后续扩展，当前仓库补充了三份详细手册：
 
-- [docs/ARCHITECTURE.md](/data/openresty-install/docs/ARCHITECTURE.md)
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
   当前最终架构设计说明
-- [docs/OPERATIONS.md](/data/openresty-install/docs/OPERATIONS.md)
+- [docs/OPERATIONS.md](docs/OPERATIONS.md)
   日常运维、排障、活动高峰前检查与变更流程
-- [docs/CONFIGURATION.md](/data/openresty-install/docs/CONFIGURATION.md)
+- [docs/CONFIGURATION.md](docs/CONFIGURATION.md)
   配置修改、扩系统、调容量、启停不同能力层的操作说明
 
 另外还有两份补充文档：
 
-- [docs/SCENARIO_GUIDE.md](/data/openresty-install/docs/SCENARIO_GUIDE.md)
+- [docs/SCENARIO_GUIDE.md](docs/SCENARIO_GUIDE.md)
   按场景说明如何新增站点、改造老站、接入第一层能力或等待室
-- [docs/ADD_NEW_SYSTEM.md](/data/openresty-install/docs/ADD_NEW_SYSTEM.md)
+- [docs/ADD_NEW_SYSTEM.md](docs/ADD_NEW_SYSTEM.md)
   新增一个系统时的快速操作说明
-- [docs/DOC_SYNC_POLICY.md](/data/openresty-install/docs/DOC_SYNC_POLICY.md)
+- [docs/DOC_SYNC_POLICY.md](docs/DOC_SYNC_POLICY.md)
   后续改代码时应同步更新哪些文档的约定
 
 ### 停止服务
@@ -692,7 +692,7 @@ make down-local
 
 ## 仓库内验证说明
 
-以后只要模板有改动，都建议同步更新本地验证命令和结果。验证入口见 [examples/curl-tests.md](/data/openresty-install/examples/curl-tests.md)，设计背景见 `docs/plans/` 下的说明文档。
+以后只要模板有改动，都建议同步更新本地验证命令和结果。验证入口见 [examples/curl-tests.md](examples/curl-tests.md)，设计背景见 `docs/plans/` 下的说明文档。
 
 本仓库已在本机于 `2026-04-03` 重新完成以下实际验证：
 
@@ -709,4 +709,4 @@ make down-local
 - 综合验证中的第一层并发压测、等待室并发模拟与等待室摘要查询全部通过
 - 本地自动化测试中的 Redis 已按带密码模式验证通过
 
-高级能力测试命令与说明见 [examples/advanced-tests.md](/data/openresty-install/examples/advanced-tests.md)。
+高级能力测试命令与说明见 [examples/advanced-tests.md](examples/advanced-tests.md)。

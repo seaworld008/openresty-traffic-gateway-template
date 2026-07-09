@@ -1,6 +1,6 @@
 services:
   openresty:
-    image: ${OPENRESTY_IMAGE:-openresty/openresty:1.29.2.3-bookworm-fat}
+    image: ${OPENRESTY_IMAGE:-openresty/openresty:1.31.1.1-1-restyrepo}
     container_name: openresty-gateway
     restart: unless-stopped
     environment:
