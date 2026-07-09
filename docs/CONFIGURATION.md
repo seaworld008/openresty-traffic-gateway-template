@@ -17,13 +17,13 @@
 
 请直接看：
 
-- [docs/SCENARIO_GUIDE.md](/data/openresty-install/docs/SCENARIO_GUIDE.md)
+- [docs/SCENARIO_GUIDE.md](SCENARIO_GUIDE.md)
 
 ## 2. 配置分层
 
 ### 2.1 主配置
 
-- [openresty/nginx.conf](/data/openresty-install/openresty/nginx.conf)
+- [openresty/nginx.conf](../openresty/nginx.conf)
 
 负责：
 
@@ -35,7 +35,7 @@
 
 ### 2.2 全局配置
 
-- [openresty/conf.d/00-global.conf](/data/openresty-install/openresty/conf.d/00-global.conf)
+- [openresty/conf.d/00-global.conf](../openresty/conf.d/00-global.conf)
 
 负责：
 
@@ -46,7 +46,7 @@
 
 ### 2.3 Upstream
 
-- [openresty/conf.d/01-upstreams.conf](/data/openresty-install/openresty/conf.d/01-upstreams.conf)
+- [openresty/conf.d/01-upstreams.conf](../openresty/conf.d/01-upstreams.conf)
 
 当前文件只保留为预留占位，不再承载业务 upstream。
 
@@ -57,30 +57,30 @@
 
 ### 2.4 可选真实 IP
 
-- [openresty/conf.d/10-real-ip.conf.example](/data/openresty-install/openresty/conf.d/10-real-ip.conf.example)
+- [openresty/conf.d/10-real-ip.conf.example](../openresty/conf.d/10-real-ip.conf.example)
 
 只有在环境能够可靠透传真实 IP 时才启用。
 
 ### 2.5 站点文件
 
-- [openresty/conf.d](/data/openresty-install/openresty/conf.d)
+- [openresty/conf.d](../openresty/conf.d)
 
 每个域名一个模板文件，直接平铺在 `conf.d/` 下，统一使用 `*.conf.example`。
 
 ### 2.6 Lua 逻辑
 
-- 第一层公共能力：[openresty/lua/gateway](/data/openresty-install/openresty/lua/gateway)
-- 第二阶段等待室：[openresty/lua/admission](/data/openresty-install/openresty/lua/admission)
+- 第一层公共能力：[openresty/lua/gateway](../openresty/lua/gateway)
+- 第二阶段等待室：[openresty/lua/admission](../openresty/lua/admission)
 
 ### 2.7 本地测试后端
 
-- [examples/backend/docker-compose.local.yml](/data/openresty-install/examples/backend/docker-compose.local.yml)
+- [examples/backend/docker-compose.local.yml](../examples/backend/docker-compose.local.yml)
 
 这个文件只用于本地联调与功能验证，不属于生产主栈。
 
 ### 2.8 场景化接入指引
 
-- [docs/SCENARIO_GUIDE.md](/data/openresty-install/docs/SCENARIO_GUIDE.md)
+- [docs/SCENARIO_GUIDE.md](SCENARIO_GUIDE.md)
 
 当你要做“新增站点”或“老站改造”时，优先先看这份文档，再回来改具体配置。
 
@@ -88,7 +88,7 @@
 
 第二阶段容量配置位于：
 
-- [openresty/lua/admission/policies.lua](/data/openresty-install/openresty/lua/admission/policies.lua)
+- [openresty/lua/admission/policies.lua](../openresty/lua/admission/policies.lua)
 
 ### 3.1 稳态容量
 
@@ -118,8 +118,8 @@ capacity = {
 
 复制：
 
-- [waitroom-enrollment-gateway.conf.example](/data/openresty-install/openresty/conf.d/waitroom-enrollment-gateway.conf.example)
-- [waitroom-java-gateway.conf.example](/data/openresty-install/openresty/conf.d/waitroom-java-gateway.conf.example)
+- [waitroom-enrollment-gateway.conf.example](../openresty/conf.d/waitroom-enrollment-gateway.conf.example)
+- [waitroom-java-gateway.conf.example](../openresty/conf.d/waitroom-java-gateway.conf.example)
 
 改成你的新系统文件，例如：
 
@@ -160,7 +160,7 @@ campus_a_enroll = {
 
 如果你们的入口统一先打到 Java gateway，再由 Java gateway 向后路由多个服务，建议直接使用：
 
-- [openresty/conf.d/waitroom-java-gateway.conf.example](/data/openresty-install/openresty/conf.d/waitroom-java-gateway.conf.example)
+- [openresty/conf.d/waitroom-java-gateway.conf.example](../openresty/conf.d/waitroom-java-gateway.conf.example)
 
 这个模板会把业务路径统一反向代理到单个 Java gateway upstream，后面的 Nacos 和服务拓扑由 Java gateway 自己处理。
 
@@ -182,9 +182,9 @@ cd openresty/conf.d
 
 如果新系统不需要等待室，只需要第一层公共能力：
 
-1. 复制 [partner-api-gateway.conf.example](/data/openresty-install/openresty/conf.d/partner-api-gateway.conf.example) 或其他合适模板
+1. 复制 [partner-api-gateway.conf.example](../openresty/conf.d/partner-api-gateway.conf.example) 或其他合适模板
 2. 绑定新的 `gateway_policy`
-3. 在 [openresty/lua/gateway/policies.lua](/data/openresty-install/openresty/lua/gateway/policies.lua) 中增加策略
+3. 在 [openresty/lua/gateway/policies.lua](../openresty/lua/gateway/policies.lua) 中增加策略
 4. `make check`
 
 如果要在站点目录就地校验，也可以执行 `./confctl.sh test`。
@@ -303,7 +303,7 @@ make reload
 
 ## 11. 相关文档
 
-- [docs/ARCHITECTURE.md](/data/openresty-install/docs/ARCHITECTURE.md)
-- [docs/OPERATIONS.md](/data/openresty-install/docs/OPERATIONS.md)
-- [docs/SCENARIO_GUIDE.md](/data/openresty-install/docs/SCENARIO_GUIDE.md)
-- [README.md](/data/openresty-install/README.md)
+- [docs/ARCHITECTURE.md](ARCHITECTURE.md)
+- [docs/OPERATIONS.md](OPERATIONS.md)
+- [docs/SCENARIO_GUIDE.md](SCENARIO_GUIDE.md)
+- [README.md](../README.md)

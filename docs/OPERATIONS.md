@@ -19,7 +19,7 @@
 
 如果你当前的任务是“新增一个站点”或“老站接入高级能力”，请先看：
 
-- [docs/SCENARIO_GUIDE.md](/data/openresty-install/docs/SCENARIO_GUIDE.md)
+- [docs/SCENARIO_GUIDE.md](SCENARIO_GUIDE.md)
 
 ## 2. 日常命令
 
@@ -320,7 +320,7 @@ make test-comprehensive
 
 ## 10. 相关文档
 
-- [docs/ARCHITECTURE.md](/data/openresty-install/docs/ARCHITECTURE.md)
-- [docs/CONFIGURATION.md](/data/openresty-install/docs/CONFIGURATION.md)
-- [docs/SCENARIO_GUIDE.md](/data/openresty-install/docs/SCENARIO_GUIDE.md)
-- [examples/waitroom-best-practice.md](/data/openresty-install/examples/waitroom-best-practice.md)
+- [docs/ARCHITECTURE.md](ARCHITECTURE.md)
+- [docs/CONFIGURATION.md](CONFIGURATION.md)
+- [docs/SCENARIO_GUIDE.md](SCENARIO_GUIDE.md)
+- [examples/waitroom-best-practice.md](../examples/waitroom-best-practice.md)

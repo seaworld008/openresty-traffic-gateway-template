@@ -41,7 +41,7 @@
 OpenResty 请默认使用下面这个镜像：
 
 ```yaml
-image: openresty/openresty:1.29.2.3-0-bookworm-fat
+image: openresty/openresty:1.31.1.1-1-restyrepo
 ```
 
 要求：

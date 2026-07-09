@@ -76,8 +76,8 @@ bash examples/scripts/deactivate_conf_examples.sh
 
 配置文件：
 
-- [openresty/conf.d/risk-protected-proxy.conf.example](/data/openresty-install/openresty/conf.d/risk-protected-proxy.conf.example)
-- [openresty/lua/gateway/policies.lua](/data/openresty-install/openresty/lua/gateway/policies.lua)
+- [openresty/conf.d/risk-protected-proxy.conf.example](../openresty/conf.d/risk-protected-proxy.conf.example)
+- [openresty/lua/gateway/policies.lua](../openresty/lua/gateway/policies.lua)
 
 ### 1. 默认请求通过
 
@@ -157,8 +157,8 @@ done
 
 配置文件：
 
-- [openresty/conf.d/partner-api-gateway.conf.example](/data/openresty-install/openresty/conf.d/partner-api-gateway.conf.example)
-- [openresty/lua/gateway/policies.lua](/data/openresty-install/openresty/lua/gateway/policies.lua)
+- [openresty/conf.d/partner-api-gateway.conf.example](../openresty/conf.d/partner-api-gateway.conf.example)
+- [openresty/lua/gateway/policies.lua](../openresty/lua/gateway/policies.lua)
 
 ### 1. 生成 JWT
 
@@ -262,8 +262,8 @@ curl -k -sS \
 
 配置文件：
 
-- [openresty/conf.d/gray-release-proxy.conf.example](/data/openresty-install/openresty/conf.d/gray-release-proxy.conf.example)
-- [openresty/lua/gateway/policies.lua](/data/openresty-install/openresty/lua/gateway/policies.lua)
+- [openresty/conf.d/gray-release-proxy.conf.example](../openresty/conf.d/gray-release-proxy.conf.example)
+- [openresty/lua/gateway/policies.lua](../openresty/lua/gateway/policies.lua)
 
 ### 1. 默认稳定版本
 

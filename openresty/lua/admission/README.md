@@ -63,4 +63,4 @@
 
 如果你要把等待室接到一个新系统或老系统上，实施步骤见：
 
-- [docs/SCENARIO_GUIDE.md](/data/openresty-install/docs/SCENARIO_GUIDE.md)
+- [docs/SCENARIO_GUIDE.md](../../../docs/SCENARIO_GUIDE.md)

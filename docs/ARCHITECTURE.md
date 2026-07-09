@@ -44,12 +44,12 @@
 
 关键文件：
 
-- [docker-compose.yml](/data/openresty-install/docker-compose.yml)
-- [examples/backend/docker-compose.local.yml](/data/openresty-install/examples/backend/docker-compose.local.yml)
-- [openresty/nginx.conf](/data/openresty-install/openresty/nginx.conf)
-- [openresty/conf.d/00-global.conf](/data/openresty-install/openresty/conf.d/00-global.conf)
-- [openresty/conf.d/01-upstreams.conf](/data/openresty-install/openresty/conf.d/01-upstreams.conf)
-- [openresty/snippets](/data/openresty-install/openresty/snippets)
+- [docker-compose.yml](../openresty/docker-compose.yml)
+- [examples/backend/docker-compose.local.yml](../examples/backend/docker-compose.local.yml)
+- [openresty/nginx.conf](../openresty/nginx.conf)
+- [openresty/conf.d/00-global.conf](../openresty/conf.d/00-global.conf)
+- [openresty/conf.d/01-upstreams.conf](../openresty/conf.d/01-upstreams.conf)
+- [openresty/snippets](../openresty/snippets)
 
 ### 3.2 第一层公共能力层
 
@@ -67,10 +67,10 @@
 
 关键文件：
 
-- [openresty/lua/gateway](/data/openresty-install/openresty/lua/gateway)
-- [openresty/conf.d/risk-protected-proxy.conf.example](/data/openresty-install/openresty/conf.d/risk-protected-proxy.conf.example)
-- [openresty/conf.d/partner-api-gateway.conf.example](/data/openresty-install/openresty/conf.d/partner-api-gateway.conf.example)
-- [openresty/conf.d/gray-release-proxy.conf.example](/data/openresty-install/openresty/conf.d/gray-release-proxy.conf.example)
+- [openresty/lua/gateway](../openresty/lua/gateway)
+- [openresty/conf.d/risk-protected-proxy.conf.example](../openresty/conf.d/risk-protected-proxy.conf.example)
+- [openresty/conf.d/partner-api-gateway.conf.example](../openresty/conf.d/partner-api-gateway.conf.example)
+- [openresty/conf.d/gray-release-proxy.conf.example](../openresty/conf.d/gray-release-proxy.conf.example)
 
 ### 3.3 第二阶段高并发等待室层
 
@@ -85,11 +85,11 @@
 
 关键文件：
 
-- [openresty/lua/admission](/data/openresty-install/openresty/lua/admission)
-- [openresty/conf.d/waitroom-enrollment-gateway.conf.example](/data/openresty-install/openresty/conf.d/waitroom-enrollment-gateway.conf.example)
-- [openresty/conf.d/waitroom-java-gateway.conf.example](/data/openresty-install/openresty/conf.d/waitroom-java-gateway.conf.example)
-- [openresty/html/waitroom/index.html](/data/openresty-install/openresty/html/waitroom/index.html)
-- [docs/SCENARIO_GUIDE.md](/data/openresty-install/docs/SCENARIO_GUIDE.md)
+- [openresty/lua/admission](../openresty/lua/admission)
+- [openresty/conf.d/waitroom-enrollment-gateway.conf.example](../openresty/conf.d/waitroom-enrollment-gateway.conf.example)
+- [openresty/conf.d/waitroom-java-gateway.conf.example](../openresty/conf.d/waitroom-java-gateway.conf.example)
+- [openresty/html/waitroom/index.html](../openresty/html/waitroom/index.html)
+- [docs/SCENARIO_GUIDE.md](SCENARIO_GUIDE.md)
 
 ## 4. 为什么要区分第一层和第二阶段
 
@@ -180,7 +180,7 @@ OpenResty 经常看不到真实客户端 IP，只能看到统一的上游出口 
 
 真实 IP 解析只保留为可选增强能力，见：
 
-- [openresty/conf.d/10-real-ip.conf.example](/data/openresty-install/openresty/conf.d/10-real-ip.conf.example)
+- [openresty/conf.d/10-real-ip.conf.example](../openresty/conf.d/10-real-ip.conf.example)
 
 ## 7. 通用扩展方式
 
@@ -212,8 +212,8 @@ OpenResty 经常看不到真实客户端 IP，只能看到统一的上游出口 
 
 公共逻辑应尽量留在：
 
-- [openresty/lua/gateway](/data/openresty-install/openresty/lua/gateway)
-- [openresty/lua/admission](/data/openresty-install/openresty/lua/admission)
+- [openresty/lua/gateway](../openresty/lua/gateway)
+- [openresty/lua/admission](../openresty/lua/admission)
 
 站点文件只负责：
 
@@ -246,12 +246,12 @@ OpenResty 经常看不到真实客户端 IP，只能看到统一的上游出口 
 2. 再按业务需要启第一层公共能力
 3. 只有热点活动入口才启第二阶段等待室
 4. 通过压测确定 `capacity.steady` 与 `capacity.burst`
-5. 上线前跑 [examples/scripts/run_comprehensive_validation.sh](/data/openresty-install/examples/scripts/run_comprehensive_validation.sh)
+5. 上线前跑 [examples/scripts/run_comprehensive_validation.sh](../examples/scripts/run_comprehensive_validation.sh)
 
 ## 10. 相关文档
 
-- [README.md](/data/openresty-install/README.md)
-- [docs/OPERATIONS.md](/data/openresty-install/docs/OPERATIONS.md)
-- [docs/CONFIGURATION.md](/data/openresty-install/docs/CONFIGURATION.md)
-- [docs/SCENARIO_GUIDE.md](/data/openresty-install/docs/SCENARIO_GUIDE.md)
-- [examples/waitroom-best-practice.md](/data/openresty-install/examples/waitroom-best-practice.md)
+- [README.md](../README.md)
+- [docs/OPERATIONS.md](OPERATIONS.md)
+- [docs/CONFIGURATION.md](CONFIGURATION.md)
+- [docs/SCENARIO_GUIDE.md](SCENARIO_GUIDE.md)
+- [examples/waitroom-best-practice.md](../examples/waitroom-best-practice.md)

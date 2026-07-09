@@ -80,7 +80,7 @@ curl -i http://127.0.0.1/healthz
 
 ## 6. 高级能力案例
 
-高级能力测试请参考 [examples/advanced-tests.md](/data/openresty-install/examples/advanced-tests.md)。
+高级能力测试请参考 [examples/advanced-tests.md](advanced-tests.md)。
 
 测试完成后，如需清理示例配置，可执行：
 

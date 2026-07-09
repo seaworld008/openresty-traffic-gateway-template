@@ -189,4 +189,4 @@ make test-waitroom
 
 如果你不确定该选哪个模板，或者要在老站上渐进式接入第一层能力 / 等待室，请直接看：
 
-- [docs/SCENARIO_GUIDE.md](/data/openresty-install/docs/SCENARIO_GUIDE.md)
+- [docs/SCENARIO_GUIDE.md](../../docs/SCENARIO_GUIDE.md)
